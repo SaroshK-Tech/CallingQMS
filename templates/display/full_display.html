@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}EQMS Display Board{% endblock %}
+
+{% block content %}
+<div class="display-board fit-screen">
+    <!-- Recent Calls Panel (1 column) -->
+    <div class="recent-calls">
+        <h2>Recent Calls</h2>
+        <div id="recentCalls">
+            {% for call in recent_calls %}
+            <div class="call-card">
+                <div class="ticket-num">{{ call.ticket.ticket_number }}</div>
+                <div class="counter-name">{{ call.counter.display_name|default:call.counter.name }}</div>
+                <div class="time">{{ call.called_at|time:"H:i:s" }}</div>
+            </div>
+            {% endfor %}
+            {% if not recent_calls %}
+            <div style="text-align: center; color: rgba(255,255,255,0.4); padding: 60px 20px;">
+                Waiting for calls...
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Advertising Area (3 columns) -->
+    <div class="advertising-area">
+        {% if ads %}
+        <div id="adSlider">
+            {% for ad in ads %}
+            <div class="ad-slide {% if forloop.first %}active{% endif %}" data-index="{{ forloop.counter0 }}">
+                {% if ad.video %}
+                <video autoplay muted loop>
+                    <source src="{{ ad.video.url }}" type="video/mp4">
+                </video>
+                {% elif ad.image %}
+                <img src="{{ ad.image.url }}" alt="{{ ad.title }}">
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; color: rgba(255,255,255,0.3);">
+            <img src="{% static 'images/logo02.png' %}" alt="AlgoriSync" style="max-width: 400px; opacity: 0.3;">
+            <p style="margin-top: 20px; font-size: 20px;">No advertisements</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const ws = new EQMSWebSocket('display', handleMessage);
+    let callsContainer = document.getElementById('recentCalls');
+
+    function handleMessage(data) {
+        if (data.type === 'ticket_called' || data.type === 'ticket_recalled') {
+            addCallCard(data);
+        }
+    }
+
+    function addCallCard(data) {
+        // Remove empty state message
+        const emptyMsg = callsContainer.querySelector('div[style]');
+        if (emptyMsg && emptyMsg.textContent.includes('Waiting for calls')) {
+            emptyMsg.remove();
+        }
+
+        const card = document.createElement('div');
+        card.className = 'call-card';
+        card.innerHTML = `
+            <div class="ticket-num">${data.ticket_number}</div>
+            <div class="counter-name">${data.counter_name}</div>
+            <div class="time">${data.called_at}</div>
+        `;
+        
+        callsContainer.insertBefore(card, callsContainer.firstChild);
+        
+        // Keep only last 4 calls
+        while (callsContainer.children.length > 4) {
+            callsContainer.removeChild(callsContainer.lastChild);
+        }
+    }
+
+    // Ad slideshow
+    {% if ads %}
+    const slides = document.querySelectorAll('.ad-slide');
+    let currentSlide = 0;
+    
+    function nextSlide() {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+    }
+    
+    setInterval(nextSlide, 10000);
+    {% endif %}
+</script>
+{% endblock %}

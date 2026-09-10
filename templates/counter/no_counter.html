@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}No Counter Assigned{% endblock %}
+
+{% block content %}
+<div class="no-counter fit-screen">
+    <div>
+        <h2>No Counter Assigned</h2>
+        <p style="margin-top: 12px;">Contact admin to assign a counter to your account.</p>
+        <a href="{% url 'logout' %}" style="margin-top: 24px; display: inline-block; color: var(--primary);">Logout</a>
+    </div>
+</div>
+{% endblock %}

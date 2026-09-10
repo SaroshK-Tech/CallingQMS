@@ -1,0 +1,25 @@
+Create A multi Counter/Station Queue Management System in django a realtime web base application (dont need to refresh page everytime) having features:
+1. kiosk screen for ticket generation
+  A brand screen with a single button for ticket generation ticket should print on receipt via default thermal printer, AlgoriSync logo is already in directory
+
+2. full display
+a screen having recent calls by counter on one side and advertising video or slide images on other side in ration 1:3 (like 1 column for recent call cards and 3 columns for advertising) no need to refresh page should update automatically
+
+3. counters/stations
+considered it as room or counter where client have to go each client have to go through all the counters (it is like a path or process queued)
+
+4. userdasboard
+each counter has one or more users logged in with their credentials and can manage calls (all available ticket tabs shows and user can select any one he wants) he can recall, next/previous (by ticket number),
+
+5. a login screen
+
+6. single counter number display
+
+receipt from kiosk should auto print without showing print dialog or any confirmation
+recept should contains AlgoriSync logo, Electronic Queue Management System, Ticket Number in bolds and big size (A001,A002), Please Wait For Your Turn, printing date/time.
+
+also this should have audio calling like "ticket # A 0 0 1 Please Proceed to (counter name)" and in urdu as well do not use windows voice you have recently create me a demo video using aidemo which has narrations use that model to generate rate audios but remember counter name can be change as well as series like "A","B" so make it reliable i dont want to do that audio stuff again and again and should have actuall sounding voice and accent especially for urdu
+
+
+
+git repo: "https://github.com/SaroshK-Tech/CallingQMS.git"

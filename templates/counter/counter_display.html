@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Counter {{ counter.display_name|default:counter.name }}{% endblock %}
+
+{% block content %}
+<div class="counter-display fit-screen">
+    <img src="{% static 'images/logo01.png' %}" alt="EQMS" style="width: clamp(60px, 8vmin, 130px); margin-bottom: clamp(16px, 3vh, 34px); opacity: 0.8;">
+    <div class="counter-name">{{ counter.display_name|default:counter.name }}</div>
+    <div class="current-ticket" id="currentTicket">---</div>
+    <div class="please-proceed" id="pleaseProceed" style="display: none;">
+        Please Proceed to Counter
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const COUNTER_ID = {{ counter.id }};
+    let lastTicket = null;
+
+    const ws = new EQMSWebSocket(`counter-display/${COUNTER_ID}`, handleMessage);
+
+    function handleMessage(data) {
+        if (data.type === 'ticket_called' || data.type === 'ticket_recalled') {
+            lastTicket = data;
+            document.getElementById('currentTicket').textContent = data.ticket_number;
+            document.getElementById('pleaseProceed').style.display = 'block';
+            
+            // Flash effect
+            document.getElementById('currentTicket').style.animation = 'none';
+            setTimeout(() => {
+                document.getElementById('currentTicket').style.animation = 'popIn 0.5s ease';
+            }, 10);
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,976 @@
+:root {
+    --primary: #0d47a1;
+    --primary-light: #1976d2;
+    --primary-dark: #002171;
+    --accent: #ff6f00;
+    --success: #2e7d32;
+    --danger: #c62828;
+    --bg: #f0f2f5;
+    --card: #ffffff;
+    --text: #1a1a2e;
+    --text-light: #64748b;
+    --border: #e2e8f0;
+    --shadow: 0 4px 12px rgba(0,0,0,0.08);
+    --radius: 16px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    width: 100%;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Breakpoints / fit: screens fill the viewport exactly.
+   The .fit-screen element simply fills body (100% x 100%).
+   All inner sizes use vw/vh/vmin-based clamp() so content
+   adapts to the screen size without needing scrollbars. */
+.fit-screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+img { max-width: 100%; }
+
+/* ============================================
+   KIOSK SCREEN - Banking Style
+   ============================================ */
+.kiosk-screen {
+    height: 100%;
+    background: linear-gradient(160deg, #0d47a1 0%, #1565c0 40%, #1976d2 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+    padding: 4vh 4vw;
+    position: relative;
+    overflow: hidden;
+}
+
+.kiosk-screen::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 50%;
+}
+
+.kiosk-screen::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -10%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 50%;
+}
+
+.kiosk-logo {
+    width: clamp(90px, 12vw, 210px);
+    margin-bottom: clamp(12px, 2.5vh, 34px);
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+    position: relative;
+    z-index: 1;
+}
+
+.kiosk-brand {
+    font-size: clamp(10px, 1.3vw, 17px);
+    font-weight: 500;
+    letter-spacing: clamp(2px, 0.3vw, 4px);
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: clamp(4px, 0.8vh, 8px);
+    position: relative;
+    z-index: 1;
+}
+
+.kiosk-title {
+    font-size: clamp(20px, 3vw, 48px);
+    font-weight: 700;
+    margin-bottom: clamp(4px, 0.8vh, 10px);
+    text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 1;
+}
+
+.kiosk-subtitle {
+    font-size: clamp(13px, 1.6vw, 22px);
+    opacity: 0.85;
+    margin-bottom: clamp(20px, 4.5vh, 48px);
+    font-weight: 400;
+    position: relative;
+    z-index: 1;
+}
+
+.kiosk-service-select {
+    margin-bottom: clamp(16px, 3vh, 32px);
+    position: relative;
+    z-index: 1;
+}
+
+.kiosk-service-select label {
+    font-size: clamp(10px, 1.1vw, 14px);
+    font-weight: 500;
+    letter-spacing: clamp(1px, 0.2vw, 2px);
+    text-transform: uppercase;
+    opacity: 0.8;
+    margin-bottom: clamp(8px, 1.2vh, 14px);
+    display: block;
+}
+
+.kiosk-service-select select {
+    padding: clamp(10px, 1.6vh, 16px) clamp(18px, 2.4vw, 32px);
+    font-size: clamp(13px, 1.5vw, 18px);
+    font-weight: 600;
+    border-radius: 12px;
+    border: 2px solid rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.1);
+    color: white;
+    min-width: clamp(200px, 22vw, 320px);
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='white'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+}
+
+.kiosk-service-select select:hover {
+    border-color: rgba(255,255,255,0.5);
+    background-color: rgba(255,255,255,0.15);
+}
+
+.kiosk-service-select select option {
+    background: #1565c0;
+    color: white;
+    padding: 12px;
+}
+
+.kiosk-btn {
+    padding: clamp(12px, 2.4vh, 28px) clamp(26px, 4vw, 72px);
+    font-size: clamp(15px, 2vw, 26px);
+    font-weight: 700;
+    background: linear-gradient(135deg, #ff8f00 0%, #ff6f00 100%);
+    color: white;
+    border: none;
+    border-radius: 60px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 32px rgba(255,111,0,0.4);
+    text-transform: uppercase;
+    letter-spacing: clamp(1px, 0.2vw, 3px);
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.kiosk-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.kiosk-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(255,111,0,0.5);
+}
+
+.kiosk-btn:hover::before {
+    left: 100%;
+}
+
+.kiosk-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.kiosk-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.kiosk-ticket-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.kiosk-ticket-popup.show {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+.kiosk-ticket {
+    background: white;
+    color: var(--text);
+    padding: clamp(24px, 4.5vh, 48px);
+    border-radius: 24px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+    text-align: center;
+    max-width: clamp(320px, 36vw, 430px);
+    width: 90%;
+    animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes popIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.kiosk-ticket .ticket-icon {
+    width: clamp(52px, 8vmin, 84px);
+    height: clamp(52px, 8vmin, 84px);
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto clamp(14px, 2.5vmin, 24px);
+    animation: bounceIn 0.6s ease;
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.kiosk-ticket .ticket-icon svg {
+    width: clamp(26px, 4vmin, 42px);
+    height: clamp(26px, 4vmin, 42px);
+    fill: white;
+}
+
+.kiosk-ticket-number {
+    font-size: clamp(40px, 9vmin, 86px);
+    font-weight: 900;
+    color: var(--primary);
+    letter-spacing: clamp(2px, 0.5vmin, 6px);
+    line-height: 1;
+    margin-bottom: clamp(10px, 1.8vmin, 16px);
+}
+
+.kiosk-ticket-label {
+    font-size: clamp(11px, 1.8vmin, 14px);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: clamp(1px, 0.25vmin, 2px);
+    color: var(--text-light);
+    margin-bottom: 8px;
+}
+
+.kiosk-ticket-message {
+    font-size: clamp(15px, 2.2vmin, 20px);
+    color: var(--success);
+    font-weight: 600;
+    margin-bottom: clamp(10px, 1.8vmin, 16px);
+}
+
+.kiosk-ticket-datetime {
+    font-size: clamp(11px, 1.5vmin, 14px);
+    color: var(--text-light);
+}
+
+.kiosk-ticket-close {
+    margin-top: clamp(16px, 3vh, 32px);
+    padding: clamp(10px, 1.8vh, 14px) clamp(28px, 4vw, 48px);
+    font-size: clamp(13px, 1.6vw, 16px);
+    font-weight: 600;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.kiosk-ticket-close:hover {
+    background: var(--primary-dark);
+}
+
+.kiosk-footer {
+    position: absolute;
+    bottom: clamp(8px, 2vh, 24px);
+    font-size: clamp(9px, 1vw, 13px);
+    opacity: 0.5;
+    z-index: 1;
+}
+
+/* ============================================
+   DISPLAY BOARD
+   ============================================ */
+.display-board {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    background: linear-gradient(180deg, #0a0e27 0%, #111833 100%);
+    color: white;
+}
+
+.recent-calls {
+    background: rgba(255,255,255,0.03);
+    padding: clamp(16px, 2.5vh, 32px) clamp(12px, 1.6vw, 24px);
+    overflow-y: hidden;
+    border-right: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.recent-calls h2 {
+    font-size: clamp(13px, 1.4vw, 17px);
+    font-weight: 600;
+    margin-bottom: clamp(14px, 2vh, 24px);
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: clamp(2px, 0.3vw, 3px);
+    padding-bottom: clamp(10px, 1.5vh, 16px);
+    border-bottom: 2px solid rgba(255,255,255,0.1);
+}
+
+.call-card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: clamp(12px, 2.5vh, 24px);
+    margin-bottom: clamp(8px, 1.2vh, 12px);
+    border-left: 4px solid var(--accent);
+    animation: slideIn 0.5s ease;
+    transition: background 0.3s;
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.call-card:first-child {
+    background: rgba(255,111,0,0.1);
+    border-left-color: #69f0ae;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.call-card .ticket-num {
+    font-size: clamp(22px, 3vw, 42px);
+    font-weight: 900;
+    color: #69f0ae;
+    letter-spacing: clamp(1px, 0.2vw, 2px);
+}
+
+.call-card .counter-name {
+    font-size: clamp(12px, 1.3vw, 15px);
+    color: var(--accent);
+    margin-top: clamp(4px, 0.6vh, 6px);
+    font-weight: 600;
+}
+
+.call-card .time {
+    font-size: clamp(11px, 1.2vw, 13px);
+    color: rgba(255,255,255,0.4);
+    margin-top: clamp(3px, 0.4vh, 4px);
+}
+
+.advertising-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(16px, 2.5vh, 32px);
+    min-height: 0;
+    overflow: hidden;
+}
+
+.ad-slide {
+    width: 100%;
+    height: 100%;
+    display: none;
+    animation: fadeIn 1s ease;
+}
+
+.ad-slide.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.ad-slide img, .ad-slide video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 16px;
+}
+
+/* ============================================
+   COUNTER DISPLAY (Single)
+   ============================================ */
+.counter-display {
+    height: 100%;
+    background: linear-gradient(180deg, #0a0e27 0%, #111833 100%);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: clamp(20px, 4vh, 40px);
+}
+
+.counter-display .current-ticket {
+    font-size: clamp(44px, 15vmin, 170px);
+    font-weight: 900;
+    color: #69f0ae;
+    text-shadow: 0 0 60px rgba(105, 240, 174, 0.4);
+    letter-spacing: clamp(2px, 0.8vmin, 8px);
+    line-height: 1;
+}
+
+.counter-display .counter-name {
+    font-size: clamp(20px, 3vw, 36px);
+    color: var(--accent);
+    margin-top: clamp(16px, 3vh, 26px);
+    font-weight: 600;
+}
+
+.counter-display .please-proceed {
+    font-size: clamp(14px, 1.8vw, 22px);
+    margin-top: clamp(20px, 4vh, 32px);
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: clamp(2px, 0.4vw, 4px);
+}
+
+/* ============================================
+   USER DASHBOARD
+   ============================================ */
+.dashboard {
+    height: 100%;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.dashboard-header {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+    color: white;
+    padding: clamp(10px, 1.6vh, 16px) clamp(14px, 2vw, 32px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    flex: 0 0 auto;
+}
+
+.dashboard-header h1 {
+    font-size: clamp(14px, 1.5vw, 18px);
+    font-weight: 600;
+}
+
+.dashboard-header .user-info {
+    display: flex;
+    align-items: center;
+    gap: clamp(8px, 1vw, 16px);
+}
+
+.dashboard-header .counter-badge {
+    background: var(--accent);
+    padding: clamp(6px, 1vh, 8px) clamp(14px, 1.6vw, 20px);
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: clamp(12px, 1.3vw, 14px);
+}
+
+.btn-logout {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: none;
+    padding: clamp(8px, 1.2vh, 10px) clamp(12px, 1.5vw, 20px);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.btn-logout:hover {
+    background: rgba(255,255,255,0.25);
+}
+
+.dashboard-body {
+    flex: 1 1 0;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(12px, 1.8vh, 24px);
+    padding: clamp(14px, 2.5vh, 32px);
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.panel {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: clamp(16px, 2.5vh, 28px);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.panel h2 {
+    font-size: clamp(13px, 1.4vw, 16px);
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: clamp(12px, 2vh, 20px);
+    padding-bottom: clamp(10px, 1.5vh, 16px);
+    border-bottom: 2px solid var(--border);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.ticket-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(clamp(120px, 9vw, 160px), 1fr));
+    gap: clamp(8px, 1.2vh, 12px);
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    align-content: start;
+}
+
+.ticket-item {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: clamp(10px, 1.8vh, 20px) clamp(8px, 1.2vw, 16px);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.ticket-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(46,125,50,0.2);
+    border-color: var(--success);
+}
+
+.ticket-item.selected {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, #bbdefb 0%, #90caf9 100%);
+    box-shadow: 0 8px 20px rgba(13,71,161,0.3);
+}
+
+.ticket-item .ticket-num {
+    font-size: clamp(20px, 2vw, 28px);
+    font-weight: 900;
+    color: var(--primary-dark);
+    letter-spacing: 1px;
+}
+
+.ticket-item .ticket-service {
+    font-size: clamp(10px, 1.1vw, 13px);
+    color: var(--text-light);
+    margin-top: clamp(4px, 0.6vh, 6px);
+    font-weight: 500;
+}
+
+.currently-serving {
+    text-align: center;
+    padding: clamp(16px, 3vh, 32px);
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border-radius: 16px;
+    margin-bottom: clamp(12px, 2.5vh, 24px);
+}
+
+.currently-serving .big-ticket {
+    font-size: clamp(64px, 12vh, 170px);
+    font-weight: 900;
+    color: var(--primary-dark);
+    letter-spacing: clamp(2px, 0.6vw, 6px);
+    line-height: 1;
+}
+
+.currently-serving .big-counter {
+    font-size: clamp(14px, 1.8vw, 20px);
+    color: var(--primary);
+    margin-top: clamp(8px, 1.2vh, 12px);
+    font-weight: 600;
+}
+
+.currently-serving .no-ticket {
+    font-size: clamp(14px, 1.8vw, 18px);
+    color: var(--text-light);
+    padding: clamp(16px, 3vh, 32px);
+}
+
+.action-buttons {
+    display: flex;
+    gap: clamp(8px, 1.2vh, 12px);
+    justify-content: stretch;
+    flex-wrap: nowrap;
+}
+
+.action-btn {
+    flex: 1 1 0;
+    padding: clamp(12px, 1.8vh, 16px) clamp(18px, 2vw, 32px);
+    font-size: clamp(14px, 1.5vw, 17px);
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.action-btn:hover { 
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-call { background: linear-gradient(135deg, #4caf50, #2e7d32); color: white; }
+.btn-recall { background: linear-gradient(135deg, #ff9800, #e65100); color: white; }
+.btn-next { background: linear-gradient(135deg, #1976d2, #0d47a1); color: white; }
+.btn-complete { background: linear-gradient(135deg, #00c853, #00897b); color: white; }
+
+.recent-history {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: clamp(10px, 1.6vh, 14px) clamp(10px, 1vw, 12px);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s;
+}
+
+.history-item:hover {
+    background: var(--bg);
+}
+
+.history-item .ticket-num {
+    font-weight: 700;
+    color: var(--primary);
+    min-width: 80px;
+}
+
+.history-item .status {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: clamp(10px, 1vw, 11px);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-completed { background: #e8f5e9; color: #2e7d32; }
+.status-called { background: #fff3e0; color: #e65100; }
+.status-waiting { background: #e3f2fd; color: #1565c0; }
+
+/* ============================================
+   PRINT RECEIPT - Banking QMS Style
+   ============================================ */
+.receipt-container {
+    display: none;
+}
+
+@media print {
+    /* Remove all page margins, headers, and footers */
+    @page {
+        size: 80mm auto;
+        margin: 0;
+    }
+    
+    /* Hide everything except receipt */
+    html, body {
+        visibility: hidden !important;
+        display: block !important;
+        width: 80mm;
+        height: auto;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+    
+    body * {
+        visibility: hidden !important;
+        display: none !important;
+    }
+    
+    .receipt-container,
+    .receipt-container * {
+        visibility: visible !important;
+        display: block !important;
+    }
+    
+    .receipt-container {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 80mm;
+        margin: 0;
+        padding: 5mm;
+        font-family: 'Courier New', 'Consolas', monospace;
+        background: white;
+        color: #000;
+        font-size: 12px;
+        line-height: 1.3;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+    
+    .receipt-header {
+        text-align: center;
+        padding: 2mm 0;
+    }
+    
+    .receipt-logo {
+        width: 45mm;
+        margin: 0 auto;
+        display: block;
+    }
+    
+    .receipt-divider {
+        border-top: 1px dashed #000;
+        margin: 2mm 0;
+    }
+    
+    .receipt-divider-thick {
+        border-top: 2px solid #000;
+        margin: 3mm 0;
+    }
+    
+    .receipt-title {
+        text-align: center;
+        font-weight: bold;
+        font-size: 10px;
+        padding: 1mm 0;
+        letter-spacing: 0.5px;
+    }
+    
+    .receipt-subtitle {
+        text-align: center;
+        font-size: 9px;
+        color: #333;
+        padding: 1mm 0;
+    }
+    
+    .receipt-ticket-section {
+        text-align: center;
+        padding: 3mm 0;
+    }
+    
+    .receipt-ticket-label {
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 2mm;
+    }
+    
+    .receipt-ticket-number {
+        font-size: 36px;
+        font-weight: 900;
+        letter-spacing: 4px;
+        line-height: 1.1;
+        padding: 2mm 0;
+    }
+    
+    .receipt-message {
+        text-align: center;
+        font-size: 9px;
+        padding: 2mm 0;
+        font-weight: 600;
+    }
+    
+    .receipt-footer {
+        text-align: center;
+        padding: 2mm 0;
+        font-size: 8px;
+        color: #333;
+    }
+    
+    .receipt-datetime {
+        text-align: center;
+        font-size: 8px;
+        color: #555;
+        padding: 2mm 0;
+    }
+    
+    .receipt-barcode {
+        text-align: center;
+        font-size: 8px;
+        letter-spacing: 2px;
+        padding: 2mm 0;
+    }
+}
+
+/* ============================================
+   NO COUNTER PAGE
+   ============================================ */
+.no-counter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: clamp(15px, 2vw, 24px);
+    color: var(--text-light);
+    text-align: center;
+    padding: 4vh 4vw;
+}
+
+.no-counter h2 {
+    color: var(--text);
+    margin-bottom: 12px;
+}
+
+/* ============================================
+   LOGIN PAGE
+   ============================================ */
+.login-container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.2);
+    padding: clamp(24px, 5vh, 48px);
+    width: 100%;
+    max-width: clamp(340px, 32vw, 440px);
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: clamp(18px, 3.5vh, 36px);
+}
+
+.logo img {
+    height: clamp(56px, 7vh, 84px);
+}
+
+.logo h1 {
+    color: var(--primary);
+    font-size: clamp(16px, 1.8vw, 22px);
+    margin-top: clamp(10px, 1.8vh, 16px);
+    font-weight: 700;
+}
+
+.form-group {
+    margin-bottom: clamp(12px, 2.5vh, 20px);
+}
+
+.form-group label {
+    display: block;
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: clamp(5px, 1vh, 8px);
+    font-size: clamp(12px, 1.4vw, 14px);
+}
+
+.form-group input {
+    width: 100%;
+    padding: clamp(11px, 1.8vh, 14px) clamp(13px, 1.8vw, 16px);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: clamp(14px, 1.6vw, 16px);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(13,71,161,0.1);
+}
+
+.btn-login {
+    width: 100%;
+    padding: clamp(11px, 1.8vh, 14px);
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: clamp(15px, 1.7vw, 16px);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: clamp(6px, 1vh, 10px);
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(13,71,161,0.3);
+}
+
+.error {
+    background: #ffebee;
+    color: #c62828;
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 24px;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.loading {
+    animation: pulse 1.5s infinite;
+}

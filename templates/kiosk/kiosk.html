@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}EQMS - Ticket Kiosk{% endblock %}
+
+{% block content %}
+<div class="kiosk-screen fit-screen">
+    <img src="{% static 'images/logo01.png' %}" alt="AlgoriSync Logo" class="kiosk-logo">
+    <div class="kiosk-brand">AlgoriSync</div>
+    <h1 class="kiosk-title">Electronic Queue Management System</h1>
+    <p class="kiosk-subtitle">Press the button below to get your ticket</p>
+
+    <button class="kiosk-btn" onclick="getTicket()" id="ticketBtn">
+        GET TICKET
+    </button>
+
+    <div class="kiosk-footer">Powered by AlgoriSync</div>
+</div>
+
+<!-- Ticket Popup -->
+<div class="kiosk-ticket-popup" id="ticketPopup">
+    <div class="kiosk-ticket">
+        <div class="ticket-icon">
+            <svg viewBox="0 0 24 24"><path d="M22 10V6c0-1.11-.9-2-2-2H4c-1.1 0-1.99.89-1.99 2v4c1.1 0 1.99.9 1.99 2s-.89 2-2 2v4c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-4c-1.1 0-2-.9-2-2s.9-2 2-2zm-2-1.46c-1.19.69-2 1.99-2 3.46s.81 2.77 2 3.46V18H4v-2.54c1.19-.69 2-1.99 2-3.46 0-1.48-.81-2.77-2-3.46V6h16v2.54z"/></svg>
+        </div>
+        <div class="kiosk-ticket-label">Your Ticket Number</div>
+        <div class="kiosk-ticket-number" id="ticketNumber"></div>
+        <div class="kiosk-ticket-message">Please Wait For Your Turn</div>
+        <div class="kiosk-ticket-datetime" id="ticketDateTime"></div>
+        <button class="kiosk-ticket-close" onclick="closeTicketPopup()">OK</button>
+    </div>
+</div>
+
+<script>
+const SERVICE_ID = {{ default_service.id }};
+const LOGO_URL = '{% static "images/logo01.png" %}';
+let isProcessing = false;
+
+async function getTicket() {
+    if (isProcessing) return;
+    isProcessing = true;
+
+    const btn = document.getElementById('ticketBtn');
+    btn.disabled = true;
+    btn.textContent = 'GENERATING...';
+
+    try {
+        const response = await fetch('{% url "generate_ticket" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({ service_id: SERVICE_ID })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            showTicketPopup(data.ticket_number, data.created_at);
+            printReceipt(data.ticket_number, data.created_at);
+            
+            setTimeout(() => {
+                btn.textContent = 'GET TICKET';
+                btn.disabled = false;
+                isProcessing = false;
+            }, 2000);
+        } else {
+            alert(data.error || 'Failed to generate ticket');
+            btn.textContent = 'GET TICKET';
+            btn.disabled = false;
+            isProcessing = false;
+        }
+    } catch (e) {
+        alert('Network error. Please try again.');
+        btn.textContent = 'GET TICKET';
+        btn.disabled = false;
+        isProcessing = false;
+    }
+}
+
+function showTicketPopup(ticketNumber, datetime) {
+    document.getElementById('ticketNumber').textContent = ticketNumber;
+    document.getElementById('ticketDateTime').textContent = datetime;
+    document.getElementById('ticketPopup').classList.add('show');
+    setTimeout(closeTicketPopup, 2000);
+}
+
+function closeTicketPopup() {
+    document.getElementById('ticketPopup').classList.remove('show');
+}
+
+function printReceipt(ticketNumber, datetime) {
+    var iframe = document.createElement('iframe');
+    iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;';
+    document.body.appendChild(iframe);
+    
+    var doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write('<!DOCTYPE html><html><head><meta charset="utf-8"><style>@page { size: 80mm auto; margin: 0; }</style></head><body style="margin:12mm 0;padding:0;width:100%;font-family:Courier New,monospace;font-size:14px;color:#000;background:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;"></body></html>');
+    doc.close();
+    
+    var body = doc.body;
+    var c = 'text-align:center;display:block;';
+    
+    // Thick line
+    var d1 = doc.createElement('div');
+    d1.style.cssText = c + 'width:100%;border-top:2px solid #000;margin:1mm 0;';
+    body.appendChild(d1);
+
+    // Title
+    var t1 = doc.createElement('div');
+    t1.style.cssText = c + 'font-weight:bold;font-size:14px;';
+    t1.textContent = 'ELECTRONIC QUEUE';
+    body.appendChild(t1);
+
+    var t2 = doc.createElement('div');
+    t2.style.cssText = c + 'font-weight:bold;font-size:14px;';
+    t2.textContent = 'MANAGEMENT SYSTEM';
+    body.appendChild(t2);
+
+    var t3 = doc.createElement('div');
+    t3.style.cssText = c + 'font-size:11px;margin:1mm 0 2mm;';
+    t3.textContent = 'AlgoriSync';
+    body.appendChild(t3);
+
+    // Thin line
+    var d2 = doc.createElement('div');
+    d2.style.cssText = c + 'width:100%;border-top:1px dashed #000;margin:2mm 0;';
+    body.appendChild(d2);
+
+    // Ticket label
+    var lbl = doc.createElement('div');
+    lbl.style.cssText = c + 'font-size:11px;letter-spacing:2px;';
+    lbl.textContent = 'YOUR TICKET NUMBER';
+    body.appendChild(lbl);
+
+    // Ticket number - BIG
+    var num = doc.createElement('div');
+    num.style.cssText = c + 'font-size:42px;font-weight:900;letter-spacing:4px;margin:2mm 0;';
+    num.textContent = ticketNumber;
+    body.appendChild(num);
+
+    // Thin line
+    var d3 = doc.createElement('div');
+    d3.style.cssText = c + 'width:100%;border-top:1px dashed #000;margin:2mm 0;';
+    body.appendChild(d3);
+
+    // Message
+    var msg = doc.createElement('div');
+    msg.style.cssText = c + 'font-size:12px;font-weight:600;margin:2mm 0;';
+    msg.textContent = 'PLEASE WAIT FOR YOUR TURN';
+    body.appendChild(msg);
+
+    // Thin line
+    var d4 = doc.createElement('div');
+    d4.style.cssText = c + 'width:100%;border-top:1px dashed #000;margin:2mm 0;';
+    body.appendChild(d4);
+
+    // DateTime
+    var dt = doc.createElement('div');
+    dt.style.cssText = c + 'font-size:11px;margin:2mm 0;';
+    dt.textContent = datetime;
+    body.appendChild(dt);
+
+    // Thick line
+    var d5 = doc.createElement('div');
+    d5.style.cssText = c + 'width:100%;border-top:2px solid #000;margin:1mm 0;';
+    body.appendChild(d5);
+
+    // Footer
+    var ft = doc.createElement('div');
+    ft.style.cssText = c + 'font-size:10px;margin:0 0 2mm;';
+    ft.textContent = 'Thank you for your patience';
+    body.appendChild(ft);
+
+    // Logo at the bottom
+    var img = doc.createElement('img');
+    img.src = LOGO_URL;
+    img.style.cssText = c + 'width:50mm;margin:0 auto;';
+    body.appendChild(img);
+    
+    function doPrint() {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+        setTimeout(function() { document.body.removeChild(iframe); }, 1000);
+    }
+    
+    img.onload = function() { setTimeout(doPrint, 100); };
+    img.onerror = function() { doPrint(); };
+}
+</script>
+{% endblock %}
