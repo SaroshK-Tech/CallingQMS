@@ -13,6 +13,7 @@ change the **font size** and change the **brightness in percent**.
 esp32_display/
 ├── platformio.ini              PlatformIO project (optional)
 ├── README.md                   this file
+├── WIRING.txt                  pin table, power, level shifter, checklist
 └── eqms_display/
     ├── eqms_display.ino        firmware (open this in the Arduino IDE)
     ├── config.h                pins, defaults, timings

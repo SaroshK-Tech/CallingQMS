@@ -1,0 +1,291 @@
+===========================================================================
+ EQMS ESP32 + P10 (HUB12, 1/4 scan) COUNTER DISPLAY
+ WIRING AND CONFIGURATION REFERENCE
+===========================================================================
+
+Panel type : single-color P10 LED module, 32 x 16 px, HUB12 connector,
+             1/4 scan (A/B row address, C/D not used)
+Controller : ESP32 DevKit (ESP32-WROOM-32 / DevKitC); ESP32-S3 also works
+             if the pin numbers below are valid on your board
+Firmware   : esp32_display/eqms_display/eqms_display.ino
+Settings   : esp32_display/eqms_display/config.h (pins, defaults, timings)
+
+
+---------------------------------------------------------------------------
+ 1. HUB12 -> ESP32 PIN TABLE (firmware defaults)
+---------------------------------------------------------------------------
+
+ HUB12 signal        IDC pin     config.h macro     ESP32 GPIO
+ ------------------  ----------  -----------------  ----------
+ OE / EN             1           PIN_OE             4
+ A  (row address)    2           PIN_A              25
+ B  (row address)    3           PIN_B              26
+ GND                 4,6,8,      (not a GPIO)       GND
+                     10-16
+ R1 / DATA           5           PIN_DATA           23
+ CLK / SCK           7           PIN_SCK            18
+ LAT / STB           9           PIN_LATCH          27
+ C, D                --          PIN_C / PIN_D      not used (-1)
+
+ Notes:
+ - HUB12 is not as strictly standardized as HUB75. Some modules shuffle the
+   control pins, so check the silkscreen or datasheet of YOUR module.
+ - If the panel is dark or shows garbage, the first thing to try is swapping
+   the A/B/OE/CLK/LAT/DATA assignments to match your module.
+ - Only the #define PIN_* values in config.h need to change; no other code
+   edits are required.
+
+
+---------------------------------------------------------------------------
+ 2. POWER AND GROUND (READ THIS FIRST)
+---------------------------------------------------------------------------
+
+ - Power the P10 panel from a dedicated 5 V supply, NOT from the ESP32
+   3.3 V pin and NOT from the ESP32 5 V/VIN pin when running on USB.
+ - A single 32 x 16 P10 module can draw about 1.5 - 2 A at full brightness.
+   Use a 5 V / 3 A (or larger) supply.
+ - Connect all grounds together: 5 V supply GND, panel GND, ESP32 GND.
+ - Never feed 5 V into an ESP32 GPIO. ESP32 pins are 3.3 V only.
+ - Add a large electrolytic capacitor (e.g. 1000 uF / 10 V) across the
+   panel's 5 V and GND close to the HUB12 connector. This removes most
+   flicker/ghosting caused by a weak supply or long wires.
+ - Keep the wires between ESP32 and HUB12 short (a few cm if possible).
+
+
+---------------------------------------------------------------------------
+ 3. LOGIC LEVEL - 74HCT245 LEVEL SHIFTER (RECOMMENDED)
+---------------------------------------------------------------------------
+
+ The P10 panel expects 5 V logic. Many boards work with the ESP32's 3.3 V
+ outputs over short wires, but if you see missing rows, flicker, ghosting,
+ random dots or a completely blank panel, add a level shifter.
+
+ Use a 74HCT245 (HCT, NOT HC - HCT has 3.3 V-compatible inputs), powered
+ from 5 V:
+
+   ESP32 GPIO  --->  74HCT245 A input
+                     74HCT245 B output  --->  HUB12 signal
+   74HCT245 DIR  --->  5 V (A -> B)
+   74HCT245 /OE  --->  GND (always enabled)
+   74HCT245 VCC  --->  5 V
+   74HCT245 GND  --->  common GND
+
+ Signals to pass through the buffer:
+   A, B, CLK, LAT, OE, DATA   (6 channels)
+
+ A 74HC245 or a plain 74HC125 will NOT reliably work: their inputs are not
+ 3.3 V compatible at a 5 V supply.
+
+
+---------------------------------------------------------------------------
+ 4. CONFIG BUTTON
+---------------------------------------------------------------------------
+
+ Function : hold ~1.5 s while the firmware is running to start the Wi-Fi
+            setup access point
+ GPIO     : CONFIG_BUTTON_PIN = 0  (the BOOT button on most DevKits)
+ Hold time: CONFIG_BUTTON_HOLD_MS = 1500 ms
+ Wiring   : momentary push button between GPIO 0 and GND
+            (internal pull-up is enabled, no external resistor needed)
+
+ WARNING: do NOT hold the button while resetting or powering the board.
+ GPIO 0 low at boot puts the ESP32 into download/flash mode. Hold it only
+ after the firmware has started.
+
+ Factory reset without the web page: hold the config button while powering
+ the board; the next boot starts the setup AP again.
+
+
+---------------------------------------------------------------------------
+ 5. FIRST-TIME SETUP (ACCESS POINT)
+---------------------------------------------------------------------------
+
+ 1. Power the ESP32 + panel. If no Wi-Fi is saved, the board starts in
+    configuration mode automatically.
+    Otherwise hold the config button for ~1.5 s.
+ 2. Connect a phone/laptop to:
+       SSID     : EQMS-Display-XXXX   (XXXX = last bytes of the ESP32 MAC)
+       Password : eqms1234
+ 3. Open http://192.168.4.1/  (captive portal usually opens it automatically)
+ 4. Enter:
+       Wi-Fi network   : pick from scan list or type the SSID
+       Wi-Fi password  : blank = keep previous; tick "Open network" if none
+       Server host     : EQMS server IP/hostname, e.g. 192.168.1.10
+                         (a port may be included: 192.168.1.10:8000)
+       Port            : 8000 by default
+       Counter ID      : numeric Django Counter id, the same one used in
+                         /counter/display/<id>/
+       Font size       : 1x ... 4x (max depends on panel height)
+       Brightness      : 0 - 100 %
+ 5. Press "Save & restart".
+ 6. The same page is reachable later at http://<device-ip>/ or
+    http://eqms-display-xxxx.local/ while the device is on the LAN.
+
+ Portal buttons:
+   Save & restart           save everything (Wi-Fi, server, counter, display)
+                            and reboot
+   Apply display settings   apply brightness + font size immediately
+   Restart                  reboot the device
+   Factory reset            erase all settings and reboot into setup mode
+
+
+---------------------------------------------------------------------------
+ 6. NETWORK ENDPOINTS USED
+---------------------------------------------------------------------------
+
+ Realtime  : ws://<server>:<port>/ws/counter-display/<counter-id>/
+ Snapshot  : GET http://<server>:<port>/display/api/counter/<counter-id>/
+
+ - The snapshot is read on boot and on every WebSocket (re)connect.
+ - Polling: every 30 s while the WebSocket is up, every 3 s while it is down.
+ - The server must run through ASGI (Daphne/Channels) for the WebSocket,
+   e.g.  .venv\Scripts\daphne -b 0.0.0.0 -p 8000 eqms.asgi:application
+   or start_server_on_host.bat.
+
+
+---------------------------------------------------------------------------
+ 7. FONT SIZE AND BRIGHTNESS
+---------------------------------------------------------------------------
+
+ - Text uses the library's 3 x 5 pixel font, scaled 1x - 4x.
+ - Effective maximum = panel height / 5:
+       16 px panel (single P10)   -> up to 3x
+       32 px panel (two rows)     -> up to 4x
+ - Default 2x on a single 32 x 16 panel: a 4-character ticket (e.g. A007)
+   fits without scrolling; longer text scrolls left.
+ - Brightness 0-100 % maps to the panel's 8-bit PWM dimming.
+ - Both values are stored in NVS and survive power loss.
+
+
+---------------------------------------------------------------------------
+ 8. MULTIPLE P10 MODULES (OPTIONAL)
+---------------------------------------------------------------------------
+
+ In config.h:
+
+   #define PANEL_PIXEL_WIDTH   32
+   #define PANEL_PIXEL_HEIGHT  16
+   #define PANEL_MODULES_WIDE  1   // 2 = two modules side by side
+   #define PANEL_MODULES_HIGH  1
+
+ Default scan is zig-zag daisy-chain (SCAN_ZIGZAG): one HUB12 cable from
+ module to module. Parallel HUB12 rows (SCAN_PARALLEL) are supported by the
+ library but need extra data wires and are not part of this default setup.
+
+
+---------------------------------------------------------------------------
+ 9. FIRMWARE DEFAULTS (config.h)
+---------------------------------------------------------------------------
+
+   DEFAULT_WIFI_SSID       ""      (empty = start in setup mode)
+   DEFAULT_WIFI_PASSWORD   ""
+   DEFAULT_SERVER_HOST     ""      (server IP/hostname)
+   DEFAULT_SERVER_PORT     8000
+   DEFAULT_COUNTER_ID      1
+   DEFAULT_BRIGHTNESS      70      (percent)
+   DEFAULT_FONT_SCALE      2       (1..4)
+   CONFIG_AP_PREFIX        "EQMS-Display-"
+   CONFIG_AP_PASSWORD      "eqms1234"
+
+ Timing:
+   WIFI_CONNECT_TIMEOUT_MS      20000
+   WS_RECONNECT_INTERVAL_MS      5000
+   SNAPSHOT_INTERVAL_WS_MS      30000
+   SNAPSHOT_INTERVAL_NO_WS_MS    3000
+   HTTP_TIMEOUT_MS               2500
+   SCROLL_STEP_MS                  55
+   FLASH_DURATION_MS             1400
+   FLASH_STEP_MS                  200
+
+
+---------------------------------------------------------------------------
+10. CHANGING PINS
+---------------------------------------------------------------------------
+
+ Edit only these lines in esp32_display/eqms_display/config.h, then rebuild:
+
+   #define PIN_A      25
+   #define PIN_B      26
+   #define PIN_C      -1
+   #define PIN_D      -1
+   #define PIN_LATCH  27
+   #define PIN_SCK    18
+   #define PIN_OE      4
+   #define PIN_DATA   23
+   #define CONFIG_BUTTON_PIN 0
+
+ Rules:
+ - Avoid ESP32 strapping pins for the panel signals when possible
+   (GPIO 0, 2, 5, 12, 15 have boot-time functions).
+ - GPIO 6-11 are used by the internal SPI flash - never use them.
+ - Input-only pins (34-39) cannot drive the panel outputs.
+ - C and D stay at -1 for HUB12 (1/4 scan).
+
+
+---------------------------------------------------------------------------
+11. BUILD AND FLASH
+---------------------------------------------------------------------------
+
+ PlatformIO (recommended):
+   cd esp32_display
+   pio run                        build
+   pio run -t upload              flash (add --upload-port COM4 on Windows)
+   pio device monitor             serial log at 115200
+
+ Arduino IDE:
+   1. Install ESP32 board support (Espressif).
+   2. Library Manager: FansElectronics_DMD32 1.1.0,
+      WebSockets 2.7.x, ArduinoJson 7.x
+   3. Open eqms_display/eqms_display.ino (folder name must stay
+      "eqms_display" so config.h and portal_page.h open as tabs).
+   4. Board: ESP32 Dev Module, upload speed 921600 (use 115200 if unstable).
+   5. If upload cannot connect: hold BOOT, tap EN/RST, release BOOT, retry.
+
+ Expected serial log on boot:
+   [EQMS] booting ESP32 P10 display
+   [EQMS] counter=1 server=192.168.1.10:8000 bright=70 scale=2
+   [EQMS] Wi-Fi connected, IP: 192.168.1.42
+   [EQMS] WebSocket ws://192.168.1.10:8000/ws/counter-display/1/
+   [EQMS] WebSocket connected
+   [EQMS] snapshot: active=0 ticket=
+
+
+---------------------------------------------------------------------------
+12. QUICK CHECKS / TROUBLESHOOTING
+---------------------------------------------------------------------------
+
+ [ ] 5 V supply connected to panel VCC and GND (not the ESP32)
+ [ ] ESP32 GND, panel GND and 5 V GND all tied together
+ [ ] No 5 V signal connected directly to an ESP32 GPIO
+ [ ] OE, A, B, CLK, LAT, DATA match the PIN_* values in config.h
+ [ ] 74HCT245 installed (5 V VCC, /OE to GND, DIR to 5 V) if unstable
+ [ ] Capacitor across the panel 5 V/GND
+ [ ] Counter ID matches the Django Counter id (see /counter/display/<id>/)
+ [ ] The ticket is today's and active at that counter
+ [ ] Server reachable from the panel's network, running via Daphne/Channels
+ [ ] Brightness > 0 and font scale valid
+ [ ] Config button held ~1.5 s while running (not during reset)
+
+ Symptom                          -> What to check
+ --------------------------------    -------------------------------------
+ Panel stays dark                 -> 5 V + GND, OE pin, brightness > 0,
+                                     PIN_* mapping
+ Random dots / ghosting /         -> 74HCT245 level shifter, shorter wires,
+ missing rows                        capacitor, lower brightness
+ Shows "---" but ticket called    -> Counter ID, ticket must be today's
+                                     and active at that counter
+ Wi-Fi ok but no updates          -> server host/port, same network,
+                                     server running through Daphne
+ WebSocket disconnected loop      -> firewall/proxy, WSGI runner instead
+                                     of ASGI
+ Cannot enter setup mode          -> hold button ~1.5 s while running;
+                                     check CONFIG_BUTTON_PIN and GND
+ Setup AP not visible             -> Wi-Fi already saved: hold the button
+                                     or use "Factory reset"
+ Text cut off                     -> increase font scale, or let it scroll
+ Upload fails                     -> hold BOOT, tap EN, release BOOT;
+                                     lower upload speed to 115200
+
+===========================================================================
+ End of reference. See esp32_display/README.md for the full documentation.
+===========================================================================
