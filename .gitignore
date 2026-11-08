@@ -16,6 +16,11 @@ error.txt
 *.log
 kiosk_config.txt
 
+# PlatformIO build output
+.pio/
+.pioenvs/
+.piolibdeps/
+
 # Secrets
 credentials.txt
 

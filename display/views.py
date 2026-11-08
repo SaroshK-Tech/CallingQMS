@@ -11,9 +11,10 @@ ticket number, so the layout is stable.
 import re
 
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
+from core import queueing
 from core.models import Advertisement, Counter, Ticket, TicketCall
 
 PLACEHOLDER = '---'
@@ -146,6 +147,37 @@ def full_display(request):
 
 def api_now_serving(request):
     return JsonResponse(board_state())
+
+
+def api_counter_now_serving(request, counter_id):
+    """Current call for one counter, used by the ESP32/P10 display panel.
+
+    Public on purpose: the panel has no login session and only reads the same
+    ticket number that is already shown on the public board.
+    """
+    counter = get_object_or_404(Counter, id=counter_id, is_active=True)
+    call = queueing.active_call(counter)
+    ticket = call.ticket if call is not None else None
+
+    return JsonResponse({
+        'counter_id': counter.id,
+        'counter_name': counter.display_name or counter.name,
+        'active': call is not None,
+        'ticket_id': ticket.id if ticket else None,
+        'ticket_number': ticket.ticket_number if ticket else None,
+        'service': ticket.service.name if ticket else None,
+        'service_prefix': ticket.service.prefix if ticket else None,
+        'called_at': (
+            timezone.localtime(call.called_at).strftime('%H:%M:%S')
+            if call else None
+        ),
+        'called_at_iso': (
+            timezone.localtime(call.called_at).isoformat()
+            if call else None
+        ),
+        'recall_count': call.recall_count if call else 0,
+        'server_time': timezone.localtime().isoformat(),
+    })
 
 
 def api_advertisements(request):

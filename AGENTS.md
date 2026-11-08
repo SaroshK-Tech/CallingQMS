@@ -22,6 +22,7 @@ accounts/       # Login/logout, user management
 kiosk/          # Ticket generation kiosk screen
 counter/        # Counter dashboard, WebSocket consumers
 display/        # Full display board (1:3 calls:ads ratio)
+esp32_display/  # ESP32 + P10 (HUB12) counter display firmware
 static/         # CSS, JS, images, audio files
 templates/      # All HTML templates
 ```
@@ -36,6 +37,7 @@ templates/      # All HTML templates
 | `/counter/dashboard/` | Counter control panel (requires login) |
 | `/counter/display/<id>/` | Single counter display |
 | `/display/` | Full display board |
+| `/display/api/counter/<id>/` | Current call for one counter (JSON, used by the ESP32 panel) |
 | `/feedback/<ticket_number>/` | Public per-ticket feedback page |
 | `/admin/` | Django admin |
 
@@ -110,6 +112,30 @@ WebSockets use relative host detection, so they work from any IP automatically.
 - Regenerate with `python generate_audio.py` when adding new counters
 - For production: replace gTTS with professional voice service
 
+## ESP32 / P10 Counter Display Firmware
+
+`esp32_display/` holds an Arduino/PlatformIO firmware for a physical per-counter
+display: ESP32 + single-color **P10 / HUB12 (1/4 scan)** panel just like the
+browser's single counter display.
+
+- **Realtime**: WebSocket `ws://<server>:<port>/ws/counter-display/<counter-id>/`
+  (`SingleCounterConsumer`); initial/reconnect state from
+  `GET /display/api/counter/<counter-id>/` (`display.views.api_counter_now_serving`).
+  Snapshot polling: 30 s with WS up, 3 s without.
+- **Display**: ticket number, flash on call/recall, `---` when idle, left scroll
+  when the text is wider than the panel. Font = library `Font3x5` scaled 1×–4×
+  (effective max `panel height / 5`, so 3× on a 16 px panel).
+- **Config button** (default GPIO 0, hold ~1.5 s): starts AP
+  `EQMS-Display-XXXX` / `eqms1234`, captive-portal DNS, page at
+  `http://192.168.4.1/` for Wi-Fi + password, server host/port, counter id,
+  font size and brightness %. Same page also reachable at the device's LAN IP.
+- **Stack**: `FansElectronics_DMD32` (v1.1.0), `WebSockets` (Links2004),
+  `ArduinoJson` v7. Pins/defaults live in `esp32_display/eqms_display/config.h`.
+- **Backend tests**: `display/tests.py::CounterDisplayApiTests` covers the JSON
+  snapshot endpoint.
+- Full wiring, flashing, setup, panel sizing and troubleshooting:
+  `esp32_display/README.md`.
+
 ## Models
 
 - **Service**: Ticket category (A=General, B=VIP, …). `is_usual=True` means the
@@ -143,6 +169,7 @@ WebSockets use relative host detection, so they work from any IP automatically.
 6. **Audio Announcements**: English + Urdu, parametric generation for dynamic counter names
 7. **Single Counter Display**: Shows current ticket for waiting area
 8. **Same-day only**: Waiting lists, display board, and selection show only today's tickets (no back-dates, regardless of status)
+9. **ESP32 P10 Counter Display**: physical single-color P10/HUB12 panel per counter; shows the called ticket in realtime over `ws/counter-display/<id>/`, with a config button that opens a Wi-Fi setup portal (network/password, server, counter, font size, brightness)
 
 ## Setup Notes
 
@@ -159,4 +186,7 @@ WebSockets use relative host detection, so they work from any IP automatically.
 - WebSocket consumers in `counter/consumers.py`
 - Real-time updates broadcast to all connected clients (`all_dashboards`, `display_board`)
 - Audio playback in `static/js/main.js` via AudioAnnouncer class; call/recall announcements are triggered server-side
-- Tests: `python manage.py test` (queueing, dashboard API, public feedback, kiosk, WebSocket broadcasts, display board)
+- ESP32/P10 firmware lives in `esp32_display/` (see its `README.md`); its state
+  endpoint is `display/api/counter/<id>/` and it listens on the same
+  `counter-display` WebSocket as the browser's single counter display
+- Tests: `python manage.py test` (queueing, dashboard API, public feedback, kiosk, WebSocket broadcasts, display board, single-counter JSON API)

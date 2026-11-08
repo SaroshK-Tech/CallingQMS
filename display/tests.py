@@ -179,6 +179,77 @@ class DisplayBoardTests(TestCase):
         self.assertEqual(len(payload['calls']), 2)
 
 
+class CounterDisplayApiTests(TestCase):
+    """Single-counter JSON feed for the ESP32 / P10 display panel."""
+
+    def setUp(self):
+        self.service = Service.objects.create(name='General', prefix='A')
+        self.counter = Counter.objects.create(name='Counter 1', display_name='Cash Counter')
+        self.other = Counter.objects.create(name='Counter 2', display_name='Room 1 Blood Collection')
+
+    def make_call(self, number, counter, recall_count=0):
+        ticket = Ticket.objects.create(
+            service=self.service,
+            ticket_number=number,
+            number=int(number.lstrip('A')),
+            status=Ticket.Status.CALLED,
+            current_counter=counter,
+        )
+        return TicketCall.objects.create(
+            ticket=ticket,
+            counter=counter,
+            recall_count=recall_count,
+        )
+
+    def test_returns_the_current_call_for_the_requested_counter(self):
+        self.make_call('A007', self.counter, recall_count=2)
+
+        payload = self.client.get(f'/display/api/counter/{self.counter.id}/').json()
+
+        self.assertTrue(payload['active'])
+        self.assertEqual(payload['counter_id'], self.counter.id)
+        self.assertEqual(payload['counter_name'], 'Cash Counter')
+        self.assertEqual(payload['ticket_number'], 'A007')
+        self.assertEqual(payload['service'], 'General')
+        self.assertEqual(payload['service_prefix'], 'A')
+        self.assertEqual(payload['recall_count'], 2)
+        self.assertTrue(payload['called_at'])
+        self.assertTrue(payload['server_time'])
+
+    def test_idle_counter_returns_an_inactive_payload(self):
+        payload = self.client.get(f'/display/api/counter/{self.counter.id}/').json()
+
+        self.assertFalse(payload['active'])
+        self.assertIsNone(payload['ticket_number'])
+        self.assertEqual(payload['recall_count'], 0)
+
+    def test_other_counter_calls_are_not_reported(self):
+        self.make_call('A001', self.other)
+
+        payload = self.client.get(f'/display/api/counter/{self.counter.id}/').json()
+
+        self.assertFalse(payload['active'])
+        self.assertIsNone(payload['ticket_number'])
+
+    def test_no_show_and_served_calls_are_not_reported(self):
+        call = self.make_call('A001', self.counter)
+        call.no_show = True
+        call.save(update_fields=['no_show'])
+
+        payload = self.client.get(f'/display/api/counter/{self.counter.id}/').json()
+
+        self.assertFalse(payload['active'])
+        self.assertIsNone(payload['ticket_number'])
+
+    def test_unknown_or_inactive_counter_returns_404(self):
+        self.counter.is_active = False
+        self.counter.save(update_fields=['is_active'])
+
+        response = self.client.get(f'/display/api/counter/{self.counter.id}/')
+
+        self.assertEqual(response.status_code, 404)
+
+
 class DisplayStationMatchingTests(TestCase):
     """Station rows are matched by counter name, and stay fixed when missing."""
 

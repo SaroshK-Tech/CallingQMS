@@ -1,3 +1,1 @@
-cash is like a main counter it should have button to terminate client (cancelled ticket) also after the confirmation from cash  all other stations (in main category) should display the client 
-
-if need any further explaination asked
+now for display counter i have ESP32 UE with p10 display board (single color) with hub12 connector and 1/4 scan, create its firmware so that it can display linked counter's ticket number on call (it should update in realtime as soon as ticket been called by that espesific counter) also it should have a configuration button (like a normal on/off button which starts esp in configuration mode where user can connect with esp's as a web server and select network and sets networks  password, also can change font size like how big or small text (ticket number) should apear on display and also change its brightness in percents 
