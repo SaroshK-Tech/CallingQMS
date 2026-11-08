@@ -28,7 +28,7 @@
 #include <WebSocketsClient.h>
 #include <ArduinoJson.h>
 #include <FansElectronics_DMD32.h>
-#include <fonts/Font3x5.h>
+#include "fonts/Font5x7.h"
 
 #include "config.h"
 #include "portal_page.h"
@@ -52,7 +52,6 @@ enum DeviceMode {
 };
 
 FansElectronics_DMD32 dmd;
-FansElectronics_Bitmap *scratch = nullptr;
 WebServer server(80);
 DNSServer dnsServer;
 WebSocketsClient ws;
@@ -77,9 +76,6 @@ uint8_t snapshotFailures = 0;
 // What the panel is showing right now.
 String currentTicket;
 String lastLine;
-uint8_t lastScale = 0;
-uint32_t scrollOffset = 0;
-uint32_t lastScrollAt = 0;
 
 bool hasTransient = false;
 String transientText;
@@ -205,52 +201,9 @@ String lineToShow() {
   return currentTicket.length() ? currentTicket : String(F("---"));
 }
 
-bool textNeedsScroll(const String &text, uint8_t scale) {
-  if (scratch == nullptr) return false;
-  return (scratch->textWidth(text) * scale) > dmd.width();
-}
-
-void drawScaledText(const String &text, uint8_t scale) {
-  if (scratch == nullptr) return;
-
-  scratch->clear();
-  scratch->setFont(Font3x5);
-  scratch->setTextColor(FansElectronics_Bitmap::White);
-  scratch->drawText(0, 0, text);
-
-  const int baseW = scratch->textWidth(text);
-  const int baseH = scratch->textHeight();
-  const int totalW = baseW * scale;
-  const int totalH = baseH * scale;
-  const int startX = (totalW <= dmd.width()) ? (dmd.width() - totalW) / 2 : -(int)scrollOffset;
-  const int startY = (dmd.height() - totalH) / 2;
-
-  for (int y = 0; y < baseH; ++y) {
-    for (int x = 0; x < baseW; ++x) {
-      if (scratch->pixel(x, y) != FansElectronics_Bitmap::White) continue;
-
-      const int px = startX + x * scale;
-      const int py = startY + y * scale;
-      for (int sy = 0; sy < scale; ++sy) {
-        for (int sx = 0; sx < scale; ++sx) {
-          const int dx = px + sx;
-          const int dy = py + sy;
-          if (dx >= 0 && dx < dmd.width() && dy >= 0 && dy < dmd.height()) {
-            dmd.setPixel(dx, dy, FansElectronics_Bitmap::White);
-          }
-        }
-      }
-    }
-  }
-}
-
 void renderFrame(const String &line, uint8_t scale) {
-  // Draw directly to the panel buffer using the library's built-in text
-  // renderer. The custom scratch-bitmap scaler (drawScaledText) caused
-  // partial-row display on some HUB12 panel variants; drawing directly is
-  // simpler and more reliable.
   dmd.clear();
-  dmd.setFont(Font3x5);
+  dmd.setFont(Font5x7);
   dmd.setTextColor(FansElectronics_Bitmap::White);
 
   int textW = dmd.textWidth(line);
@@ -666,12 +619,6 @@ void setup() {
 
   dmd.begin(PANEL_HUB12, PANEL_MODULES_WIDE, PANEL_MODULES_HIGH, panelPins());
   applyBrightness();
-
-  scratch = new FansElectronics_Bitmap(384, 8);
-  if (scratch != nullptr) {
-    scratch->setFont(Font3x5);
-    scratch->setTextColor(FansElectronics_Bitmap::White);
-  }
 
   pinMode(CONFIG_BUTTON_PIN, INPUT_PULLUP);
 
