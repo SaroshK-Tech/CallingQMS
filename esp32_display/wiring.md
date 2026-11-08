@@ -248,6 +248,10 @@ Rules:
 - GPIO 6–11 are used by the internal SPI flash - never use them.
 - Input-only pins (34–39) cannot drive the panel outputs.
 - Keep `PIN_C` / `PIN_D` at `-1` for HUB12 (1/4 scan).
+- On WROVER/PSRAM boards GPIO16/17 are used by PSRAM, so move `A`/`B` to free
+  pins such as 25/26 and update `config.h` accordingly.
+- Keep signal wires short (under ~20 cm) and keep a ground return next to the
+  ribbon/breakout.
 
 ## Build and flash
 
