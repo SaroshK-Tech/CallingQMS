@@ -28,7 +28,7 @@
 #include <WebSocketsClient.h>
 #include <ArduinoJson.h>
 #include <FansElectronics_DMD32.h>
-#include "fonts/Font5x7.h"
+#include <fonts/Font5x7b.h>
 
 #include "config.h"
 #include "portal_page.h"
@@ -203,7 +203,7 @@ String lineToShow() {
 
 void renderFrame(const String &line, uint8_t scale) {
   dmd.clear();
-  dmd.setFont(Font5x7);
+  dmd.setFont(Font5x7b);
   dmd.setTextColor(FansElectronics_Bitmap::White);
 
   int textW = dmd.textWidth(line);
