@@ -1,20 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Counter Dashboard - {{ counter.display_name|default:counter.name }}{% endblock %}
-
-{% block extra_css %}
-<style>
-    .no-counter {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        font-size: 24px;
-        color: var(--text-light);
-    }
-</style>
-{% endblock %}
+{% block title %}Counter Control Panel - {{ counter.display_name|default:counter.name }}{% endblock %}
 
 {% block content %}
 {% if not counter %}
@@ -26,147 +13,284 @@
     </div>
 </div>
 {% else %}
-<div class="dashboard fit-screen">
-    <div class="dashboard-header">
-        <h1>EQMS Counter Dashboard</h1>
-        <div class="user-info">
-            <span class="counter-badge">{{ counter.display_name|default:counter.name }}</span>
-            <span>{{ request.user.get_full_name|default:request.user.username }}</span>
-            <a href="{% url 'logout' %}" class="btn-logout">Logout</a>
+<div class="dash">
+    <header class="dash-header">
+        <div class="dash-brand">
+            <span class="dash-brand-title">EQMS</span>
+            <span class="dash-brand-sub">Counter control panel</span>
         </div>
-    </div>
+        <div class="dash-user">
+            <span class="dash-counter">{{ counter.display_name|default:counter.name }}</span>
+            <span class="dash-username">{{ request.user.get_full_name|default:request.user.username }}</span>
+            <a href="{% url 'logout' %}" class="dash-logout">Logout</a>
+        </div>
+    </header>
 
-    <div class="dashboard-body">
-        <!-- Currently Serving Panel -->
-        <div class="panel" style="grid-column: 1 / -1;">
-            <div class="currently-serving" id="currentlyServing">
-                {% if currently_serving %}
-                <div style="color: var(--text-light); font-size: 16px; margin-bottom: 8px;">Now Serving</div>
-                <div class="big-ticket" id="currentTicketNum">{{ currently_serving.ticket_number }}</div>
-                <div class="big-counter" id="currentCounterName">{{ counter.display_name|default:counter.name }}</div>
-                {% else %}
-                <div style="color: var(--text-light); font-size: 16px; margin-bottom: 8px;">No ticket selected</div>
-                <div class="big-ticket" id="currentTicketNum">---</div>
-                <div class="big-counter" id="currentCounterName">{{ counter.display_name|default:counter.name }}</div>
-                {% endif %}
+    <main class="dash-board">
+        <!-- 1. Waiting queue -->
+        <section class="dash-card dash-waiting">
+            <div class="dash-card-head">
+                <h2>Waiting</h2>
+                <span class="dash-head-time">Time</span>
             </div>
-            <div class="action-buttons">
-                <button class="action-btn btn-recall" onclick="recallSelected()" id="btnRecall" disabled>Recall</button>
-                <button class="action-btn btn-next" onclick="nextTicket()">Next</button>
-                <button class="action-btn btn-complete" onclick="doneSelected()" id="btnDone" disabled>Done</button>
-            </div>
-        </div>
+            <div class="dash-scroll" id="waitingList" aria-live="polite"></div>
+        </section>
 
-        <!-- Waiting Tickets -->
-        <div class="panel" style="grid-column: 1 / -1;">
-            <h2>Waiting Tickets</h2>
-            <div class="ticket-grid" id="waitingTickets">
-                {% for ticket in waiting_tickets %}
-                <div class="ticket-item" data-id="{{ ticket.id }}" data-number="{{ ticket.ticket_number }}" onclick="selectTicket(this)">
-                    <div class="ticket-num">{{ ticket.ticket_number }}</div>
-                    <div class="ticket-time">{{ ticket.service.name }}</div>
-                </div>
-                {% endfor %}
-                {% if not waiting_tickets %}
-                <div style="text-align: center; color: var(--text-light); padding: 40px; grid-column: 1 / -1;">
-                    No waiting tickets
-                </div>
-                {% endif %}
+        <!-- 2. Already called clients -->
+        <section class="dash-card dash-called">
+            <div class="dash-card-head">
+                <h2>Called</h2>
+                <span class="dash-head-time">Time</span>
             </div>
-        </div>
-    </div>
+            <div class="dash-scroll" id="calledList" aria-live="polite"></div>
+        </section>
+
+        <!-- 3. Active client / timer / actions -->
+        <section class="dash-card dash-active">
+            <div class="dash-active-top">
+                <span class="dash-active-label">Time on station</span>
+                <div class="dash-timer" id="activeTimer">00:00</div>
+            </div>
+
+            <div class="dash-active-main">
+                <div class="dash-active-ticket" id="activeTicket">---</div>
+                <div class="dash-active-service" id="activeService">&nbsp;</div>
+                <div class="dash-active-called" id="activeCalled">&nbsp;</div>
+            </div>
+
+            <div class="dash-actions">
+                <button type="button" class="dash-action dash-action-no-show" id="btnNoShow" disabled>
+                    No Show
+                </button>
+                <button type="button" class="dash-action dash-action-done" id="btnDoneNext" disabled>
+                    Done &amp; Next
+                </button>
+                <button type="button" class="dash-action dash-action-recall" id="btnRecall" disabled>
+                    Recall
+                </button>
+            </div>
+        </section>
+    </main>
 </div>
+
+<!-- Feedback is collected on the public /feedback/<ticket>/ page only, never from Done & Next. -->
+
+{{ state|json_script:"dashboard-state" }}
 {% endif %}
 {% endblock %}
 
 {% block extra_js %}
+{% if counter %}
 <script>
+(function () {
     const COUNTER_ID = {{ counter.id }};
-    const COUNTER_SERVICE_IDS = {{ service_ids }};
-    let selectedTicketId = null;
-    let selectedTicketNumber = null;
-    let currentTicketId = null;
+    const STATE_URL = "{% url 'counter_dashboard_state' %}";
 
-    // WebSocket
-    const ws = new EQMSWebSocket(`dashboard/${COUNTER_ID}`, handleWSMessage);
+    const waitingList = document.getElementById('waitingList');
+    const calledList = document.getElementById('calledList');
+    const activeTicket = document.getElementById('activeTicket');
+    const activeService = document.getElementById('activeService');
+    const activeCalled = document.getElementById('activeCalled');
+    const activeTimer = document.getElementById('activeTimer');
+    const btnNoShow = document.getElementById('btnNoShow');
+    const btnDoneNext = document.getElementById('btnDoneNext');
+    const btnRecall = document.getElementById('btnRecall');
 
-    function handleWSMessage(data) {
-        if (data.type === 'ticket_created') {
-            addTicketToGrid(data);
-        }
+    let state = JSON.parse(document.getElementById('dashboard-state').textContent || '{}');
+    let skewMs = 0;
+    let refreshTimer = null;
 
-        if (data.type === 'ticket_called' || data.type === 'ticket_recalled') {
-            currentTicketId = data.ticket_id;
-            document.getElementById('currentTicketNum').textContent = data.ticket_number;
-            document.getElementById('currentCounterName').textContent = data.counter_name;
-            document.getElementById('btnRecall').disabled = false;
-            document.getElementById('btnDone').disabled = false;
-            selectedTicketId = null;
-        }
+    const ws = new EQMSWebSocket(`dashboard/${COUNTER_ID}`, function () {
+        scheduleRefresh();
+    });
 
-        if (data.type === 'ticket_served') {
-            currentTicketId = null;
-            document.getElementById('currentTicketNum').textContent = '---';
-            document.getElementById('btnRecall').disabled = true;
-            document.getElementById('btnDone').disabled = true;
-            removeTicketFromList(data.ticket_id);
-        }
-    }
-
-    function addTicketToGrid(data) {
-        if (COUNTER_SERVICE_IDS.length && !COUNTER_SERVICE_IDS.includes(data.service_id)) return;
-        const grid = document.getElementById('waitingTickets');
-        if (grid.querySelector(`.ticket-item[data-id="${data.ticket_id}"]`)) return;
-
-        const emptyMsg = grid.querySelector('div[style]');
-        if (emptyMsg && emptyMsg.textContent.includes('No waiting tickets')) {
-            emptyMsg.remove();
-        }
-
-        const item = document.createElement('div');
-        item.className = 'ticket-item';
-        item.dataset.id = data.ticket_id;
-        item.dataset.number = data.ticket_number;
-        item.setAttribute('onclick', 'selectTicket(this)');
-        item.innerHTML = `
-            <div class="ticket-num">${data.ticket_number}</div>
-            <div class="ticket-time">${data.service}</div>
-        `;
-        grid.appendChild(item);
-    }
-
-    function selectTicket(el) {
-        ws.send({
-            action: 'call_ticket',
-            ticket_id: parseInt(el.dataset.id),
-            counter_id: COUNTER_ID,
-        });
-        selectedTicketId = null;
-    }
-
-    function recallSelected() {
-        if (!currentTicketId) return;
-        ws.send({
-            action: 'recall_ticket',
-            ticket_id: currentTicketId,
+    function escapeHtml(value) {
+        return String(value == null ? '' : value).replace(/[&<>"']/g, function (char) {
+            return {
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[char];
         });
     }
 
-    function nextTicket() {
-        ws.send({ action: 'next_ticket' });
+    function formatDuration(totalSeconds) {
+        const seconds = Math.max(0, Math.floor(totalSeconds));
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const rest = seconds % 60;
+        if (hours > 0) {
+            return hours + ':' + String(minutes).padStart(2, '0') + ':' + String(rest).padStart(2, '0');
+        }
+        return String(minutes).padStart(2, '0') + ':' + String(rest).padStart(2, '0');
     }
 
-    function doneSelected() {
-        if (!currentTicketId) return;
-        ws.send({
-            action: 'done_ticket',
-            ticket_id: currentTicketId,
+    function applyState(payload) {
+        if (!payload) return;
+        state = payload;
+        const serverNow = Date.parse(payload.server_time);
+        if (!Number.isNaN(serverNow)) {
+            skewMs = serverNow - Date.now();
+        }
+        render();
+    }
+
+    function render() {
+        renderWaiting();
+        renderCalled();
+        renderActive();
+        updateTimer();
+    }
+
+    function renderWaiting() {
+        if (!state.waiting || !state.waiting.length) {
+            waitingList.innerHTML = '<div class="dash-empty">No waiting clients</div>';
+            return;
+        }
+
+        waitingList.innerHTML = state.waiting.map(function (row) {
+            const noShow = row.no_show
+                ? '<span class="dash-badge" title="Did not appear earlier">No show</span>'
+                : '';
+            return '' +
+                '<button type="button" class="dash-queue-row' + (row.no_show ? ' is-no-show' : '') + '"' +
+                ' data-ticket-id="' + row.ticket_id + '" data-ticket-number="' + escapeHtml(row.ticket_number) + '">' +
+                    '<span class="dash-queue-ticket">' + escapeHtml(row.ticket_number) + '</span>' +
+                    noShow +
+                    '<span class="dash-queue-time">' + escapeHtml(row.dispensed_time) + '</span>' +
+                '</button>';
+        }).join('');
+
+        waitingList.querySelectorAll('.dash-queue-row').forEach(function (row) {
+            row.addEventListener('click', function () {
+                callTicket(Number(row.dataset.ticketId), row.dataset.ticketNumber);
+            });
         });
     }
 
-    function removeTicketFromList(ticketId) {
-        const el = document.querySelector(`.ticket-item[data-id="${ticketId}"]`);
-        if (el) el.remove();
+    function renderCalled() {
+        if (!state.called || !state.called.length) {
+            calledList.innerHTML = '<div class="dash-empty">No clients yet</div>';
+            return;
+        }
+
+        calledList.innerHTML = state.called.map(function (row) {
+            return '' +
+                '<div class="dash-queue-row is-called" title="Served at ' + escapeHtml(row.served_time) + '">' +
+                    '<span class="dash-queue-ticket">' + escapeHtml(row.ticket_number) + '</span>' +
+                    '<span class="dash-queue-time">' + escapeHtml(row.duration) + '</span>' +
+                '</div>';
+        }).join('');
     }
+
+    function renderActive() {
+        const active = state.active;
+        if (!active) {
+            activeTicket.textContent = '---';
+            activeService.innerHTML = '&nbsp;';
+            activeCalled.innerHTML = '&nbsp;';
+            btnNoShow.disabled = true;
+            btnDoneNext.disabled = true;
+            btnRecall.disabled = true;
+            return;
+        }
+
+        activeTicket.textContent = active.ticket_number;
+        activeService.textContent = active.service;
+        activeCalled.textContent = 'Called at ' + active.called_time;
+        btnNoShow.disabled = false;
+        btnDoneNext.disabled = false;
+        btnRecall.disabled = false;
+    }
+
+    function updateTimer() {
+        if (!state.active) {
+            activeTimer.textContent = '00:00';
+            return;
+        }
+        const started = Date.parse(state.active.called_at);
+        if (Number.isNaN(started)) {
+            activeTimer.textContent = '00:00';
+            return;
+        }
+        const now = Date.now() + skewMs;
+        activeTimer.textContent = formatDuration(Math.max(0, (now - started) / 1000));
+    }
+
+    function refresh() {
+        return fetch(STATE_URL, {
+            headers: { 'Accept': 'application/json' },
+            cache: 'no-store'
+        }).then(function (response) {
+            if (!response.ok) return null;
+            return response.json();
+        }).then(applyState).catch(function () { /* keep current state */ });
+    }
+
+    function scheduleRefresh() {
+        if (refreshTimer) clearTimeout(refreshTimer);
+        refreshTimer = setTimeout(function () {
+            refreshTimer = null;
+            refresh();
+        }, 150);
+    }
+
+    function send(action, extra) {
+        const payload = Object.assign({ action: action }, extra || {});
+        ws.send(payload);
+    }
+
+    function callTicket(ticketId, ticketNumber) {
+        if (!ticketId) return;
+        if (state.active && !confirm(
+            'Finish ' + state.active.ticket_number + ' and call ' + ticketNumber + ' now?'
+        )) {
+            return;
+        }
+        send('call_ticket', { ticket_id: ticketId, counter_id: COUNTER_ID });
+        scheduleRefresh();
+    }
+
+    function activeTicketId() {
+        return state.active ? state.active.ticket_id : null;
+    }
+
+    btnNoShow.addEventListener('click', function () {
+        const ticketId = activeTicketId();
+        if (!ticketId) return;
+        if (!confirm('Mark ' + state.active.ticket_number + ' as No Show and keep it in the waiting list?')) {
+            return;
+        }
+        send('no_show_ticket', { ticket_id: ticketId });
+        scheduleRefresh();
+    });
+
+    btnRecall.addEventListener('click', function () {
+        const ticketId = activeTicketId();
+        if (!ticketId) return;
+        send('recall_ticket', { ticket_id: ticketId });
+        scheduleRefresh();
+    });
+
+    btnDoneNext.addEventListener('click', function () {
+        const ticketId = activeTicketId();
+        if (!ticketId) return;
+        finishAndNext(ticketId);
+    });
+
+    function finishAndNext(ticketId) {
+        send('done_next_ticket', { ticket_id: ticketId });
+        scheduleRefresh();
+    }
+
+    // Keep the timer accurate and recover missed WebSocket events.
+    setInterval(updateTimer, 1000);
+    setInterval(refresh, 15000);
+    document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) refresh();
+    });
+
+    render();
+    refresh();
+})();
 </script>
+{% endif %}
 {% endblock %}

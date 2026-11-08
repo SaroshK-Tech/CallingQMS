@@ -1,6 +1,7 @@
 import json
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from asgiref.sync import async_to_sync
@@ -10,10 +11,8 @@ from core.models import Service, Ticket
 
 def kiosk_screen(request):
     services = Service.objects.filter(is_active=True)
-    default_service = services.first()
     return render(request, 'kiosk/kiosk.html', {
         'services': services,
-        'default_service': default_service,
     })
 
 
@@ -55,7 +54,7 @@ def generate_ticket(request):
                     'ticket_number': ticket.ticket_number,
                     'service': service.name,
                     'service_id': service.id,
-                    'created_at': ticket.created_at.strftime('%H:%M:%S'),
+                    'created_at': timezone.localtime(ticket.created_at).strftime('%H:%M:%S'),
                 },
             }
         )
@@ -63,5 +62,8 @@ def generate_ticket(request):
     return JsonResponse({
         'ticket_number': ticket.ticket_number,
         'service': service.name,
-        'created_at': ticket.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+        'created_at': timezone.localtime(ticket.created_at).strftime('%Y-%m-%d %H:%M:%S'),
+        'feedback_url': request.build_absolute_uri(
+            reverse('public_feedback', args=[ticket.ticket_number])
+        ),
     })

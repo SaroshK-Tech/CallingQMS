@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Feedback - {{ ticket.ticket_number }}{% endblock %}
+
+{% block content %}
+<div class="feedback-page">
+    <div class="feedback-card">
+        <img class="feedback-logo" src="{% static 'images/logo01.png' %}" alt="AlgoriSync">
+
+        {% if done %}
+        <div class="feedback-done">
+            <div class="feedback-done-icon">&#10003;</div>
+            <h1>Thank you for your feedback</h1>
+            <p>Your rating helps us improve the service at {{ ticket.service.name }}.</p>
+            <a class="feedback-link" href="{% url 'public_feedback' ticket.ticket_number %}">Update my feedback</a>
+        </div>
+        {% else %}
+        <h1>How was your visit?</h1>
+        <div class="feedback-ticket">{{ ticket.ticket_number }}</div>
+        <p class="feedback-service">{{ ticket.service.name }}</p>
+
+        {% if feedback %}
+        <p class="feedback-note">You already sent feedback for this ticket. You can update it below.</p>
+        {% endif %}
+        {% if error %}
+        <div class="feedback-error">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" class="feedback-form">
+            {% csrf_token %}
+            <div class="feedback-stars">
+                <input type="radio" id="pstar5" name="rating" value="5" {% if feedback.rating == 5 %}checked{% endif %}><label for="pstar5" title="5 stars">&#9733;</label>
+                <input type="radio" id="pstar4" name="rating" value="4" {% if feedback.rating == 4 %}checked{% endif %}><label for="pstar4" title="4 stars">&#9733;</label>
+                <input type="radio" id="pstar3" name="rating" value="3" {% if feedback.rating == 3 %}checked{% endif %}><label for="pstar3" title="3 stars">&#9733;</label>
+                <input type="radio" id="pstar2" name="rating" value="2" {% if feedback.rating == 2 %}checked{% endif %}><label for="pstar2" title="2 stars">&#9733;</label>
+                <input type="radio" id="pstar1" name="rating" value="1" {% if feedback.rating == 1 %}checked{% endif %}><label for="pstar1" title="1 star">&#9733;</label>
+            </div>
+
+            <textarea name="comment" rows="4" maxlength="500"
+                      placeholder="Tell us about your visit (optional)">{{ feedback.comment|default:"" }}</textarea>
+
+            <button type="submit">Submit feedback</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

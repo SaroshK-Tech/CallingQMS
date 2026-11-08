@@ -211,6 +211,76 @@ img { max-width: 100%; }
     transform: none;
 }
 
+.kiosk-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(clamp(160px, 16vw, 220px), 1fr));
+    gap: clamp(12px, 2vh, 22px);
+    width: min(980px, 92vw);
+    margin-bottom: clamp(10px, 2vh, 24px);
+    position: relative;
+    z-index: 1;
+}
+
+.kiosk-category-btn {
+    min-height: clamp(110px, 18vh, 170px);
+    padding: clamp(14px, 2.4vh, 24px) clamp(12px, 1.8vw, 26px);
+    border-radius: clamp(16px, 2.4vh, 24px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(4px, 0.8vh, 8px);
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.kiosk-category-prefix {
+    font-size: clamp(30px, 4.4vw, 58px);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 2px;
+}
+
+.kiosk-category-name {
+    font-size: clamp(11px, 1.3vw, 18px);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    opacity: 0.92;
+    text-transform: uppercase;
+}
+
+.kiosk-no-categories {
+    grid-column: 1 / -1;
+    padding: 24px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.12);
+    font-size: clamp(13px, 1.6vw, 20px);
+    font-weight: 600;
+}
+
+.kiosk-ticket-feedback {
+    margin-top: clamp(8px, 1.6vh, 16px);
+    padding-top: clamp(8px, 1.4vh, 12px);
+    border-top: 1px dashed var(--border);
+    font-size: clamp(10px, 1.4vmin, 13px);
+    color: var(--text-light);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 100%;
+}
+
+.kiosk-ticket-feedback a {
+    color: var(--primary);
+    font-weight: 600;
+    word-break: break-all;
+    text-decoration: none;
+}
+
+.kiosk-ticket-feedback a:hover {
+    text-decoration: underline;
+}
+
 .kiosk-ticket-popup {
     position: fixed;
     top: 0;
@@ -332,113 +402,237 @@ img { max-width: 100%; }
 }
 
 /* ============================================
-   DISPLAY BOARD
+   DISPLAY BOARD - Taj Medical Centre
    ============================================ */
 .display-board {
+    --db-navy: #024691;
+    --db-sky: #ceedff;
+    --db-sky-soft: #b5e5fc;
+    --db-cyan: #00adee;
+    --db-radius: clamp(14px, 2.4vh, 34px);
+
     height: 100%;
-    display: grid;
-    grid-template-columns: 1fr 3fr;
-    background: linear-gradient(180deg, #0a0e27 0%, #111833 100%);
-    color: white;
-}
-
-.recent-calls {
-    background: rgba(255,255,255,0.03);
-    padding: clamp(16px, 2.5vh, 32px) clamp(12px, 1.6vw, 24px);
-    overflow-y: hidden;
-    border-right: 1px solid rgba(255,255,255,0.1);
+    background: var(--db-sky);
+    color: var(--db-navy);
     display: flex;
     flex-direction: column;
+    padding: clamp(12px, 6.2vh, 80px) clamp(14px, 3.1vw, 64px) clamp(14px, 7.5vh, 96px);
+    overflow: hidden;
 }
 
-.recent-calls h2 {
-    font-size: clamp(13px, 1.4vw, 17px);
-    font-weight: 600;
-    margin-bottom: clamp(14px, 2vh, 24px);
-    color: var(--accent);
-    text-transform: uppercase;
-    letter-spacing: clamp(2px, 0.3vw, 3px);
-    padding-bottom: clamp(10px, 1.5vh, 16px);
-    border-bottom: 2px solid rgba(255,255,255,0.1);
-}
-
-.call-card {
-    background: rgba(255,255,255,0.05);
-    border-radius: 12px;
-    padding: clamp(12px, 2.5vh, 24px);
-    margin-bottom: clamp(8px, 1.2vh, 12px);
-    border-left: 4px solid var(--accent);
-    animation: slideIn 0.5s ease;
-    transition: background 0.3s;
-    flex: 1 1 0;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.call-card:first-child {
-    background: rgba(255,111,0,0.1);
-    border-left-color: #69f0ae;
-}
-
-@keyframes slideIn {
-    from { transform: translateX(-20px); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-}
-
-.call-card .ticket-num {
-    font-size: clamp(22px, 3vw, 42px);
-    font-weight: 900;
-    color: #69f0ae;
-    letter-spacing: clamp(1px, 0.2vw, 2px);
-}
-
-.call-card .counter-name {
-    font-size: clamp(12px, 1.3vw, 15px);
-    color: var(--accent);
-    margin-top: clamp(4px, 0.6vh, 6px);
-    font-weight: 600;
-}
-
-.call-card .time {
-    font-size: clamp(11px, 1.2vw, 13px);
-    color: rgba(255,255,255,0.4);
-    margin-top: clamp(3px, 0.4vh, 4px);
-}
-
-.advertising-area {
+/* Header */
+.db-header {
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: clamp(12px, 2.5vw, 48px);
+}
+
+.db-logo {
+    height: clamp(34px, 13.5vh, 150px);
+    width: auto;
+    max-width: 62vw;
+    object-fit: contain;
+    object-position: left center;
+}
+
+.db-clock {
+    flex: 0 0 auto;
+    text-align: right;
+    line-height: 1.1;
+}
+
+.db-date {
+    font-size: clamp(12px, 3.4vh, 36px);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.db-time {
+    margin-top: clamp(2px, 0.5vh, 6px);
+    font-size: clamp(16px, 5.1vh, 54px);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Main area */
+.db-main {
+    flex: 1 1 auto;
+    min-height: 0;
+    margin-top: clamp(10px, 4.8vh, 56px);
+    display: grid;
+    grid-template-columns: 1.21fr 1fr;
+    gap: clamp(14px, 3.2vw, 124px);
+}
+
+/* Featured call: cash counter only */
+.db-feature {
+    background: var(--db-navy);
+    color: #ffffff;
+    border-radius: var(--db-radius);
+    padding: clamp(16px, 6.4vh, 80px) clamp(14px, 3vw, 56px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    padding: clamp(16px, 2.5vh, 32px);
+    gap: clamp(8px, 3.2vh, 34px);
+    text-align: center;
     min-height: 0;
     overflow: hidden;
 }
 
-.ad-slide {
-    width: 100%;
-    height: 100%;
-    display: none;
-    animation: fadeIn 1s ease;
+.db-feature-label {
+    max-width: 100%;
+    font-size: clamp(14px, 5.2vh, 58px);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    line-height: 1.15;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0.95;
 }
 
-.ad-slide.active {
+.db-feature-ticket {
+    font-size: clamp(52px, 23vh, 268px);
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.db-feature.is-empty .db-feature-ticket {
+    opacity: 0.45;
+    letter-spacing: 0.08em;
+}
+
+.db-feature-ticket.pop {
+    animation: dbPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes dbPop {
+    from { transform: scale(0.82); opacity: 0.35; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Now serving list */
+.db-list {
+    background: var(--db-sky-soft);
+    border-radius: var(--db-radius);
+    padding: clamp(10px, 3.4vh, 42px) clamp(10px, 2.2vw, 40px);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.db-list-title {
+    flex: 0 0 auto;
+    font-size: clamp(16px, 5.4vh, 60px);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.db-list-rows {
+    flex: 1 1 0;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
+}
+
+.db-call {
+    display: grid;
+    grid-template-columns: 34% 1fr;
+    align-items: center;
+    gap: clamp(6px, 1vw, 18px);
+    min-height: 0;
+    padding: 0 clamp(2px, 0.4vw, 8px);
+}
+
+.db-call-ticket {
+    font-size: clamp(20px, 6.5vh, 72px);
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.db-call-name {
+    font-size: clamp(12px, 3.8vh, 42px);
+    font-weight: 600;
+    line-height: 1.15;
+}
+
+/* Rows stay in place even when idle: the ticket slot just shows "---". */
+.db-call.is-idle .db-call-ticket {
+    opacity: 0.4;
+    letter-spacing: 0.08em;
+}
+
+.db-call.is-idle .db-call-name {
+    opacity: 0.85;
+}
+
+/* Footer: tagline row on top, branding on its own bottom line */
+.db-footer {
+    flex: 0 0 auto;
+    margin-top: clamp(12px, 6.7vh, 76px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(4px, 1vh, 12px);
+}
+
+.db-footer-tagline {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: clamp(10px, 1.6vw, 28px);
+}
+
+.db-footer-line {
+    flex: 1 1 0;
+    height: clamp(2px, 0.8vh, 8px);
+    border-radius: 999px;
+    background: var(--db-navy);
+}
+
+.db-footer-text {
+    font-size: clamp(14px, 5.2vh, 58px);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.db-powered {
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: clamp(6px, 0.8vw, 14px);
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+.db-powered-label {
+    font-size: clamp(8px, 1.5vh, 16px);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.55;
+    white-space: nowrap;
 }
 
-.ad-slide img, .ad-slide video {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    border-radius: 16px;
+.db-powered-logo {
+    height: clamp(12px, 2.6vh, 30px);
+    width: auto;
+    opacity: 0.75;
 }
 
 /* ============================================
@@ -481,245 +675,574 @@ img { max-width: 100%; }
 }
 
 /* ============================================
-   USER DASHBOARD
+   USER DASHBOARD - COUNTER CONTROL PANEL
    ============================================ */
-.dashboard {
+.no-counter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-size: 24px;
+    color: var(--text-light);
+    text-align: center;
+}
+
+.dash {
+    --dash-bg: #ceedff;
+    --dash-blue: #90c1fc;
+    --dash-blue-deep: #2f76c9;
+    --dash-red: #ff4422;
+    --dash-gray: #cbcbcb;
     height: 100%;
-    background: var(--bg);
+    background: var(--dash-bg);
+    color: #0b1b2b;
     display: flex;
     flex-direction: column;
+    gap: clamp(8px, 1.4vh, 16px);
+    padding: clamp(10px, 1.8vh, 20px) clamp(12px, 2vw, 28px) clamp(12px, 2.2vh, 24px);
     overflow: hidden;
 }
 
-.dashboard-header {
-    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
-    color: white;
-    padding: clamp(10px, 1.6vh, 16px) clamp(14px, 2vw, 32px);
+.dash-header {
+    flex: 0 0 auto;
+    background: var(--dash-blue);
+    border-radius: clamp(10px, 1.4vh, 16px);
+    padding: clamp(8px, 1.3vh, 14px) clamp(12px, 1.8vw, 24px);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    flex: 0 0 auto;
+    gap: 12px;
+    box-shadow: 0 4px 16px rgba(2, 70, 145, 0.12);
 }
 
-.dashboard-header h1 {
-    font-size: clamp(14px, 1.5vw, 18px);
+.dash-brand {
+    display: flex;
+    align-items: baseline;
+    gap: clamp(8px, 1vw, 14px);
+    min-width: 0;
+}
+
+.dash-brand-title {
+    font-size: clamp(18px, 2vw, 28px);
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #0b2b4d;
+}
+
+.dash-brand-sub {
+    font-size: clamp(10px, 1vw, 14px);
     font-weight: 600;
+    color: #18436e;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.dashboard-header .user-info {
+.dash-user {
     display: flex;
     align-items: center;
     gap: clamp(8px, 1vw, 16px);
+    min-width: 0;
 }
 
-.dashboard-header .counter-badge {
-    background: var(--accent);
-    padding: clamp(6px, 1vh, 8px) clamp(14px, 1.6vw, 20px);
-    border-radius: 20px;
+.dash-counter {
+    background: #0b2b4d;
+    color: #fff;
+    border-radius: 999px;
+    padding: clamp(5px, 0.9vh, 8px) clamp(12px, 1.4vw, 18px);
+    font-size: clamp(11px, 1.1vw, 14px);
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 36vw;
+}
+
+.dash-username {
+    font-size: clamp(11px, 1.1vw, 14px);
+    font-weight: 600;
+    color: #113a63;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dash-logout {
+    background: rgba(255, 255, 255, 0.55);
+    color: #0b2b4d;
+    text-decoration: none;
+    border-radius: 9px;
+    padding: clamp(6px, 1vh, 9px) clamp(10px, 1.2vw, 16px);
+    font-size: clamp(11px, 1.1vw, 14px);
     font-weight: 700;
-    font-size: clamp(12px, 1.3vw, 14px);
+    white-space: nowrap;
+    transition: background 0.15s;
 }
 
-.btn-logout {
-    background: rgba(255,255,255,0.15);
-    color: white;
-    border: none;
-    padding: clamp(8px, 1.2vh, 10px) clamp(12px, 1.5vw, 20px);
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background 0.2s;
+.dash-logout:hover {
+    background: #fff;
 }
 
-.btn-logout:hover {
-    background: rgba(255,255,255,0.25);
-}
-
-.dashboard-body {
+.dash-board {
     flex: 1 1 0;
     min-height: 0;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: clamp(12px, 1.8vh, 24px);
-    padding: clamp(14px, 2.5vh, 32px);
-    max-width: 1400px;
-    width: 100%;
-    margin: 0 auto;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.08fr);
+    gap: clamp(10px, 1.5vw, 22px);
 }
 
-.panel {
-    background: var(--card);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: clamp(16px, 2.5vh, 28px);
-    border: 1px solid var(--border);
+.dash-card {
+    background: #fff;
+    border-radius: clamp(12px, 1.8vh, 18px);
+    box-shadow: 0 6px 22px rgba(2, 70, 145, 0.1);
     display: flex;
     flex-direction: column;
     min-height: 0;
     overflow: hidden;
 }
 
-.panel h2 {
-    font-size: clamp(13px, 1.4vw, 16px);
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: clamp(12px, 2vh, 20px);
-    padding-bottom: clamp(10px, 1.5vh, 16px);
-    border-bottom: 2px solid var(--border);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.ticket-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(clamp(120px, 9vw, 160px), 1fr));
-    gap: clamp(8px, 1.2vh, 12px);
-    flex: 1 1 0;
-    min-height: 0;
-    overflow-y: auto;
-    align-content: start;
-}
-
-.ticket-item {
-    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-    border: 2px solid transparent;
-    border-radius: 12px;
-    padding: clamp(10px, 1.8vh, 20px) clamp(8px, 1.2vw, 16px);
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.ticket-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(46,125,50,0.2);
-    border-color: var(--success);
-}
-
-.ticket-item.selected {
-    border-color: var(--primary);
-    background: linear-gradient(135deg, #bbdefb 0%, #90caf9 100%);
-    box-shadow: 0 8px 20px rgba(13,71,161,0.3);
-}
-
-.ticket-item .ticket-num {
-    font-size: clamp(20px, 2vw, 28px);
-    font-weight: 900;
-    color: var(--primary-dark);
-    letter-spacing: 1px;
-}
-
-.ticket-item .ticket-service {
-    font-size: clamp(10px, 1.1vw, 13px);
-    color: var(--text-light);
-    margin-top: clamp(4px, 0.6vh, 6px);
-    font-weight: 500;
-}
-
-.currently-serving {
-    text-align: center;
-    padding: clamp(16px, 3vh, 32px);
-    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-    border-radius: 16px;
-    margin-bottom: clamp(12px, 2.5vh, 24px);
-}
-
-.currently-serving .big-ticket {
-    font-size: clamp(64px, 12vh, 170px);
-    font-weight: 900;
-    color: var(--primary-dark);
-    letter-spacing: clamp(2px, 0.6vw, 6px);
-    line-height: 1;
-}
-
-.currently-serving .big-counter {
-    font-size: clamp(14px, 1.8vw, 20px);
-    color: var(--primary);
-    margin-top: clamp(8px, 1.2vh, 12px);
-    font-weight: 600;
-}
-
-.currently-serving .no-ticket {
-    font-size: clamp(14px, 1.8vw, 18px);
-    color: var(--text-light);
-    padding: clamp(16px, 3vh, 32px);
-}
-
-.action-buttons {
+.dash-card-head {
+    flex: 0 0 auto;
+    background: var(--dash-blue);
+    padding: clamp(8px, 1.3vh, 14px) clamp(12px, 1.5vw, 20px);
     display: flex;
-    gap: clamp(8px, 1.2vh, 12px);
-    justify-content: stretch;
-    flex-wrap: nowrap;
-}
-
-.action-btn {
-    flex: 1 1 0;
-    padding: clamp(12px, 1.8vh, 16px) clamp(18px, 2vw, 32px);
-    font-size: clamp(14px, 1.5vw, 17px);
-    font-weight: 700;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.action-btn:hover { 
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-}
-
-.action-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-.btn-call { background: linear-gradient(135deg, #4caf50, #2e7d32); color: white; }
-.btn-recall { background: linear-gradient(135deg, #ff9800, #e65100); color: white; }
-.btn-next { background: linear-gradient(135deg, #1976d2, #0d47a1); color: white; }
-.btn-complete { background: linear-gradient(135deg, #00c853, #00897b); color: white; }
-
-.recent-history {
-    flex: 1 1 0;
-    min-height: 0;
-    overflow-y: auto;
-}
-
-.history-item {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: clamp(10px, 1.6vh, 14px) clamp(10px, 1vw, 12px);
-    border-bottom: 1px solid var(--border);
-    transition: background 0.2s;
+    justify-content: space-between;
+    gap: 8px;
 }
 
-.history-item:hover {
-    background: var(--bg);
-}
-
-.history-item .ticket-num {
-    font-weight: 700;
-    color: var(--primary);
-    min-width: 80px;
-}
-
-.history-item .status {
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: clamp(10px, 1vw, 11px);
-    font-weight: 700;
-    text-transform: uppercase;
+.dash-card-head h2 {
+    font-size: clamp(14px, 1.5vw, 21px);
+    font-weight: 900;
+    color: #0b2b4d;
     letter-spacing: 0.5px;
 }
 
-.status-completed { background: #e8f5e9; color: #2e7d32; }
-.status-called { background: #fff3e0; color: #e65100; }
-.status-waiting { background: #e3f2fd; color: #1565c0; }
+.dash-head-time {
+    font-size: clamp(10px, 1vw, 14px);
+    font-weight: 700;
+    color: #18436e;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+/* Styled vertical scrollbars */
+.dash-scroll {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: clamp(6px, 0.9vh, 10px) clamp(8px, 1vw, 12px);
+    scrollbar-width: thin;
+    scrollbar-color: var(--dash-blue) #e9f3ff;
+    scrollbar-gutter: stable;
+}
+
+.dash-scroll::-webkit-scrollbar {
+    width: 10px;
+}
+
+.dash-scroll::-webkit-scrollbar-track {
+    background: #e9f3ff;
+    border-radius: 999px;
+}
+
+.dash-scroll::-webkit-scrollbar-thumb {
+    background: var(--dash-blue);
+    border-radius: 999px;
+    border: 2px solid #e9f3ff;
+}
+
+.dash-scroll::-webkit-scrollbar-thumb:hover {
+    background: var(--dash-blue-deep);
+}
+
+.dash-queue-row {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 4px 10px;
+    padding: clamp(9px, 1.4vh, 15px) clamp(10px, 1.1vw, 16px);
+    margin-bottom: clamp(5px, 0.8vh, 9px);
+    background: #f7fbff;
+    border: 1px solid #e2effc;
+    border-radius: clamp(9px, 1.2vh, 13px);
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s, border-color 0.15s;
+}
+
+.dash-queue-row:hover {
+    background: #e9f4ff;
+    border-color: #b8d8f8;
+    transform: translateX(2px);
+}
+
+.dash-queue-ticket {
+    font-size: clamp(18px, 2vw, 31px);
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #08213d;
+    line-height: 1.05;
+}
+
+.dash-queue-time {
+    font-size: clamp(10px, 1vw, 14px);
+    font-weight: 700;
+    color: #46627f;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.dash-queue-row.is-called {
+    cursor: default;
+}
+
+.dash-queue-row.is-called:hover {
+    background: #f7fbff;
+    border-color: #e2effc;
+    transform: none;
+}
+
+.dash-queue-row.is-no-show {
+    background: #fff6f3;
+    border-color: #ffd2c7;
+}
+
+.dash-queue-row.is-no-show:hover {
+    background: #ffefea;
+    border-color: #ffb5a6;
+}
+
+.dash-badge {
+    grid-column: 1;
+    justify-self: start;
+    background: #ffe2dc;
+    border: 1px solid #ffb5a6;
+    color: #b42a12;
+    border-radius: 999px;
+    padding: 2px 9px;
+    font-size: clamp(8px, 0.85vw, 11px);
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+.dash-empty {
+    padding: clamp(20px, 4vh, 40px) 12px;
+    text-align: center;
+    color: #5b7590;
+    font-size: clamp(12px, 1.2vw, 16px);
+    font-weight: 600;
+}
+
+/* Active client */
+.dash-active-top {
+    flex: 0 0 auto;
+    background: var(--dash-blue);
+    padding: clamp(10px, 1.6vh, 18px) clamp(12px, 1.5vw, 20px) clamp(8px, 1.2vh, 14px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.dash-active-label {
+    font-size: clamp(9px, 0.95vw, 13px);
+    font-weight: 800;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: #18436e;
+}
+
+.dash-timer {
+    font-size: clamp(34px, 5.6vw, 82px);
+    font-weight: 900;
+    line-height: 1;
+    color: #041a30;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 1px;
+}
+
+.dash-active-main {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(8px, 1.6vh, 18px);
+    text-align: center;
+}
+
+.dash-active-ticket {
+    font-size: clamp(48px, 9vw, 138px);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: clamp(2px, 0.45vw, 5px);
+    color: #000;
+    overflow-wrap: anywhere;
+}
+
+.dash-active-service {
+    margin-top: clamp(5px, 1vh, 12px);
+    font-size: clamp(12px, 1.4vw, 20px);
+    font-weight: 800;
+    color: #2f567c;
+}
+
+.dash-active-called {
+    margin-top: 4px;
+    font-size: clamp(10px, 1vw, 14px);
+    font-weight: 600;
+    color: #6d8299;
+}
+
+.dash-actions {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(6px, 1.1vh, 12px);
+    padding: clamp(8px, 1.4vh, 16px) clamp(10px, 1.4vw, 18px) clamp(10px, 1.8vh, 20px);
+}
+
+.dash-action {
+    border: 0;
+    border-radius: clamp(9px, 1.2vh, 13px);
+    padding: clamp(11px, 2vh, 19px) 12px;
+    font-family: inherit;
+    font-size: clamp(13px, 1.5vw, 20px);
+    font-weight: 900;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+    color: #0b1b2b;
+    transition: transform 0.15s, filter 0.15s, box-shadow 0.15s;
+}
+
+.dash-action:hover:not(:disabled) {
+    transform: translateY(-2px);
+    filter: brightness(0.97);
+    box-shadow: 0 8px 20px rgba(2, 70, 145, 0.16);
+}
+
+.dash-action:active:not(:disabled) {
+    transform: translateY(0) scale(0.99);
+}
+
+.dash-action:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.dash-action-no-show {
+    background: var(--dash-gray);
+}
+
+.dash-action-done {
+    background: var(--dash-blue);
+}
+
+.dash-action-recall {
+    background: var(--dash-red);
+    color: #fff;
+}
+
+@media (max-width: 900px) {
+    .dash {
+        overflow-y: auto;
+    }
+
+    .dash-board {
+        grid-template-columns: 1fr;
+        flex: 0 0 auto;
+    }
+
+    .dash-card {
+        min-height: 280px;
+    }
+
+    .dash-active {
+        min-height: 420px;
+    }
+
+    .dash-brand-sub,
+    .dash-username {
+        display: none;
+    }
+}
+
+/* ============================================
+   PUBLIC FEEDBACK PAGE
+   ============================================ */
+.feedback-page {
+    min-height: 100vh;
+    background: #ceedff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(14px, 3vh, 36px) clamp(12px, 3vw, 32px);
+}
+
+.feedback-card {
+    width: min(520px, 94vw);
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: 0 18px 60px rgba(2, 70, 145, 0.18);
+    padding: clamp(20px, 4vh, 38px);
+    text-align: center;
+}
+
+.feedback-logo {
+    width: clamp(90px, 18vw, 150px);
+    margin-bottom: clamp(12px, 2vh, 20px);
+}
+
+.feedback-card h1 {
+    font-size: clamp(20px, 2.6vw, 30px);
+    font-weight: 900;
+    color: #0b2b4d;
+    margin-bottom: 6px;
+}
+
+.feedback-ticket {
+    font-size: clamp(44px, 8vw, 72px);
+    font-weight: 900;
+    line-height: 1.05;
+    color: #024691;
+    letter-spacing: 2px;
+    margin: clamp(8px, 1.6vh, 16px) 0 2px;
+}
+
+.feedback-service {
+    font-size: clamp(12px, 1.4vw, 16px);
+    font-weight: 700;
+    color: #4a657f;
+    margin-bottom: clamp(14px, 2vh, 22px);
+}
+
+.feedback-note {
+    background: #eef7ff;
+    border: 1px solid #c6e2fb;
+    border-radius: 10px;
+    padding: 10px 12px;
+    color: #2f567c;
+    font-size: 13px;
+    margin-bottom: 14px;
+}
+
+.feedback-error {
+    background: #fff2ef;
+    border: 1px solid #ffc2b5;
+    border-radius: 10px;
+    padding: 10px 12px;
+    color: #b42a12;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 14px;
+}
+
+.feedback-stars {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: clamp(14px, 2.2vh, 22px);
+}
+
+.feedback-stars input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.feedback-stars label {
+    font-size: clamp(36px, 6vw, 54px);
+    line-height: 1;
+    color: #d8e2ec;
+    cursor: pointer;
+    transition: color 0.15s, transform 0.15s;
+}
+
+.feedback-stars label:hover,
+.feedback-stars label:hover ~ label,
+.feedback-stars input:checked ~ label {
+    color: #f5a524;
+}
+
+.feedback-stars label:hover {
+    transform: scale(1.1);
+}
+
+.feedback-form textarea {
+    width: 100%;
+    min-height: 96px;
+    resize: vertical;
+    border: 1px solid #b9d5ef;
+    border-radius: 12px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    color: #0b1b2b;
+    margin-bottom: 14px;
+}
+
+.feedback-form textarea:focus {
+    outline: 2px solid #90c1fc;
+    border-color: transparent;
+}
+
+.feedback-form button {
+    width: 100%;
+    border: 0;
+    border-radius: 12px;
+    padding: 14px;
+    background: #90c1fc;
+    color: #0b2b4d;
+    font-family: inherit;
+    font-size: clamp(15px, 1.6vw, 18px);
+    font-weight: 900;
+    cursor: pointer;
+    transition: filter 0.15s, transform 0.15s;
+}
+
+.feedback-form button:hover {
+    filter: brightness(0.96);
+    transform: translateY(-1px);
+}
+
+.feedback-done-icon {
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    background: #e8f5e9;
+    color: #2e7d32;
+    font-size: 38px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.feedback-done p {
+    color: #4a657f;
+    font-size: 14px;
+    margin-bottom: 18px;
+}
+
+.feedback-link {
+    display: inline-block;
+    color: #024691;
+    font-weight: 700;
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+}
 
 /* ============================================
    PRINT RECEIPT - Banking QMS Style

@@ -1,0 +1,166 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#002171"/>
+      <stop offset="100%" style="stop-color:#0d47a1"/>
+    </linearGradient>
+    <linearGradient id="servingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e3f2fd"/>
+      <stop offset="100%" style="stop-color:#bbdefb"/>
+    </linearGradient>
+    <linearGradient id="recallGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff9800"/>
+      <stop offset="100%" style="stop-color:#e65100"/>
+    </linearGradient>
+    <linearGradient id="nextGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1976d2"/>
+      <stop offset="100%" style="stop-color:#0d47a1"/>
+    </linearGradient>
+    <linearGradient id="doneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00c853"/>
+      <stop offset="100%" style="stop-color:#00897b"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="#f0f2f5"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="1920" height="70" fill="url(#headerGrad)"/>
+  <text x="40" y="45" fill="white" font-family="Segoe UI, sans-serif" font-size="20" font-weight="600">EQMS Counter Dashboard</text>
+  
+  <!-- Counter Badge -->
+  <rect x="1440" y="18" width="180" height="34" rx="17" fill="#ff6f00"/>
+  <text x="1530" y="41" text-anchor="middle" fill="white" font-family="Segoe UI, sans-serif" font-size="14" font-weight="700">Counter 1</text>
+  
+  <!-- User info -->
+  <text x="1660" y="45" fill="rgba(255,255,255,0.8)" font-family="Segoe UI, sans-serif" font-size="14">John Doe</text>
+  
+  <!-- Logout button -->
+  <rect x="1800" y="18" width="90" height="34" rx="8" fill="rgba(255,255,255,0.15)"/>
+  <text x="1845" y="40" text-anchor="middle" fill="white" font-family="Segoe UI, sans-serif" font-size="13" font-weight="500">Logout</text>
+
+  <!-- Main Content Area -->
+  <!-- Currently Serving Panel -->
+  <rect x="40" y="100" width="1840" height="260" rx="16" fill="white" filter="url(#cardShadow)" stroke="#e2e8f0" stroke-width="1"/>
+  
+  <!-- Currently Serving Box -->
+  <rect x="70" y="130" width="1780" height="140" rx="16" fill="url(#servingGrad)"/>
+  <text x="960" y="165" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="16">Now Serving</text>
+  <text x="960" y="245" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="80" font-weight="900" letter-spacing="4">A-012</text>
+  <text x="960" y="280" text-anchor="middle" fill="#0d47a1" font-family="Segoe UI, sans-serif" font-size="18" font-weight="600">Counter 1 - General</text>
+
+  <!-- Action Buttons -->
+  <!-- Recall -->
+  <rect x="70" y="290" width="575" height="55" rx="10" fill="url(#recallGrad)"/>
+  <text x="357" y="324" text-anchor="middle" fill="white" font-family="Segoe UI, sans-serif" font-size="17" font-weight="700" letter-spacing="2">RECALL</text>
+  
+  <!-- Next -->
+  <rect x="665" y="290" width="590" height="55" rx="10" fill="url(#nextGrad)"/>
+  <text x="960" y="324" text-anchor="middle" fill="white" font-family="Segoe UI, sans-serif" font-size="17" font-weight="700" letter-spacing="2">NEXT</text>
+  
+  <!-- Done -->
+  <rect x="1275" y="290" width="575" height="55" rx="10" fill="url(#doneGrad)"/>
+  <text x="1562" y="324" text-anchor="middle" fill="white" font-family="Segoe UI, sans-serif" font-size="17" font-weight="700" letter-spacing="2">DONE</text>
+
+  <!-- Waiting Tickets Panel -->
+  <rect x="40" y="380" width="1840" height="660" rx="16" fill="white" filter="url(#cardShadow)" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="70" y="430" fill="#1a1a2e" font-family="Segoe UI, sans-serif" font-size="16" font-weight="700" letter-spacing="1">WAITING TICKETS</text>
+  <line x1="70" y1="450" x2="1810" y2="450" stroke="#e2e8f0" stroke-width="2"/>
+
+  <!-- Ticket Grid -->
+  <!-- Row 1 -->
+  <rect x="70" y="475" width="175" height="100" rx="12" fill="linear-gradient(135deg, #e8f5e9, #c8e6c9)" stroke="transparent" stroke-width="2"/>
+  <text x="157" y="535" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">A-001</text>
+  <text x="157" y="560" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">General</text>
+
+  <rect x="265" y="475" width="175" height="100" rx="12" fill="#e8f5e9" stroke="transparent" stroke-width="2"/>
+  <text x="352" y="535" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">A-002</text>
+  <text x="352" y="560" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">General</text>
+
+  <rect x="460" y="475" width="175" height="100" rx="12" fill="#e8f5e9" stroke="transparent" stroke-width="2"/>
+  <text x="547" y="535" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">A-003</text>
+  <text x="547" y="560" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">General</text>
+
+  <rect x="655" y="475" width="175" height="100" rx="12" fill="#e8f5e9" stroke="transparent" stroke-width="2"/>
+  <text x="742" y="535" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">A-004</text>
+  <text x="742" y="560" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">General</text>
+
+  <rect x="850" y="475" width="175" height="100" rx="12" fill="#e8f5e9" stroke="transparent" stroke-width="2"/>
+  <text x="937" y="535" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">A-005</text>
+  <text x="937" y="560" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">General</text>
+
+  <rect x="1045" y="475" width="175" height="100" rx="12" fill="#e8f5e9" stroke="transparent" stroke-width="2"/>
+  <text x="1132" y="535" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">A-006</text>
+  <text x="1132" y="560" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">General</text>
+
+  <rect x="1240" y="475" width="175" height="100" rx="12" fill="#e8f5e9" stroke="transparent" stroke-width="2"/>
+  <text x="1327" y="535" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">A-007</text>
+  <text x="1327" y="560" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">General</text>
+
+  <rect x="1435" y="475" width="175" height="100" rx="12" fill="#e8f5e9" stroke="transparent" stroke-width="2"/>
+  <text x="1522" y="535" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">A-008</text>
+  <text x="1522" y="560" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">General</text>
+
+  <rect x="1630" y="475" width="175" height="100" rx="12" fill="#e8f5e9" stroke="transparent" stroke-width="2"/>
+  <text x="1717" y="535" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">A-009</text>
+  <text x="1717" y="560" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">General</text>
+
+  <!-- Row 2 -->
+  <rect x="70" y="595" width="175" height="100" rx="12" fill="#e8f5e9" stroke="transparent" stroke-width="2"/>
+  <text x="157" y="655" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">A-010</text>
+  <text x="157" y="680" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">General</text>
+
+  <rect x="265" y="595" width="175" height="100" rx="12" fill="#e8f5e9" stroke="transparent" stroke-width="2"/>
+  <text x="352" y="655" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">A-011</text>
+  <text x="352" y="680" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">General</text>
+
+  <!-- Selected ticket (blue) -->
+  <rect x="460" y="595" width="175" height="100" rx="12" fill="#bbdefb" stroke="#0d47a1" stroke-width="2"/>
+  <text x="547" y="655" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">A-013</text>
+  <text x="547" y="680" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">General</text>
+
+  <rect x="655" y="595" width="175" height="100" rx="12" fill="#e8f5e9" stroke="transparent" stroke-width="2"/>
+  <text x="742" y="655" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">B-001</text>
+  <text x="742" y="680" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">VIP</text>
+
+  <rect x="850" y="595" width="175" height="100" rx="12" fill="#e8f5e9" stroke="transparent" stroke-width="2"/>
+  <text x="937" y="655" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">B-002</text>
+  <text x="937" y="680" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">VIP</text>
+
+  <rect x="1045" y="595" width="175" height="100" rx="12" fill="#e8f5e9" stroke="transparent" stroke-width="2"/>
+  <text x="1132" y="655" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">B-003</text>
+  <text x="1132" y="680" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">VIP</text>
+
+  <rect x="1240" y="595" width="175" height="100" rx="12" fill="#e8f5e9" stroke="transparent" stroke-width="2"/>
+  <text x="1327" y="655" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">C-001</text>
+  <text x="1327" y="680" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">X-Ray</text>
+
+  <rect x="1435" y="595" width="175" height="100" rx="12" fill="#e8f5e9" stroke="transparent" stroke-width="2"/>
+  <text x="1522" y="655" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">C-002</text>
+  <text x="1522" y="680" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">X-Ray</text>
+
+  <rect x="1630" y="595" width="175" height="100" rx="12" fill="#e8f5e9" stroke="transparent" stroke-width="2"/>
+  <text x="1717" y="655" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">C-003</text>
+  <text x="1717" y="680" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">X-Ray</text>
+
+  <!-- Row 3 -->
+  <rect x="70" y="715" width="175" height="100" rx="12" fill="#e8f5e9" stroke="transparent" stroke-width="2"/>
+  <text x="157" y="775" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">C-004</text>
+  <text x="157" y="800" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">X-Ray</text>
+
+  <rect x="265" y="715" width="175" height="100" rx="12" fill="#e8f5e9" stroke="transparent" stroke-width="2"/>
+  <text x="352" y="775" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">D-001</text>
+  <text x="352" y="800" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">Lab</text>
+
+  <rect x="460" y="715" width="175" height="100" rx="12" fill="#e8f5e9" stroke="transparent" stroke-width="2"/>
+  <text x="547" y="775" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">D-002</text>
+  <text x="547" y="800" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">Lab</text>
+
+  <rect x="655" y="715" width="175" height="100" rx="12" fill="#e8f5e9" stroke="transparent" stroke-width="2"/>
+  <text x="742" y="775" text-anchor="middle" fill="#002171" font-family="Segoe UI, sans-serif" font-size="30" font-weight="900">D-003</text>
+  <text x="742" y="800" text-anchor="middle" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="12" font-weight="500">Lab</text>
+</svg>

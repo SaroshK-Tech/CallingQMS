@@ -1,5 +1,13 @@
 """
 Django settings for EQMS-AlgoriSync project.
+
+Deployment-overridable via environment variables:
+
+  EQMS_SECRET_KEY          Django secret key (any string; use something long)
+  EQMS_DEBUG               'True' / 'False' (default True)
+  EQMS_ALLOWED_HOSTS       comma-separated hosts/IPs (default '*')
+  EQMS_CSRF_TRUSTED_ORIGINS  comma-separated, e.g. http://192.168.1.10:8000
+  EQMS_DB_PATH             SQLite file path (default <project>/db.sqlite3)
 """
 
 from pathlib import Path
@@ -7,11 +15,32 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-lwz$@%6cf^ssm12tg7b+7+p8g-bef%8r!974pr8ub5z^4!k-9)'
 
-DEBUG = True
+def _env_bool(name, default=False):
+    val = os.environ.get(name)
+    if val is None:
+        return default
+    return val.strip().lower() in ('1', 'true', 'yes', 'on')
 
-ALLOWED_HOSTS = ['*']
+
+def _env_list(name, default=None):
+    val = os.environ.get(name)
+    if not val:
+        return list(default or [])
+    return [item.strip() for item in val.split(',') if item.strip()]
+
+
+SECRET_KEY = os.environ.get(
+    'EQMS_SECRET_KEY',
+    'django-insecure-lwz$@%6cf^ssm12tg7b+7+p8g-bef%8r!974pr8ub5z^4!k-9)',
+)
+
+DEBUG = _env_bool('EQMS_DEBUG', True)
+
+# Default '*' makes it easy to reach the server from any IP on the network
+ALLOWED_HOSTS = _env_list('EQMS_ALLOWED_HOSTS', ['*']) or ['*']
+
+CSRF_TRUSTED_ORIGINS = _env_list('EQMS_CSRF_TRUSTED_ORIGINS', [])
 
 INSTALLED_APPS = [
     'daphne',
@@ -20,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'channels',
     'django_cleanup.apps.CleanupConfig',
@@ -32,6 +62,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -69,7 +100,7 @@ CHANNEL_LAYERS = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.environ.get('EQMS_DB_PATH', str(BASE_DIR / 'db.sqlite3')),
     }
 }
 
@@ -88,6 +119,15 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
+    },
+}
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

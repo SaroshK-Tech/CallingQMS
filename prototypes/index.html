@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EQMS Prototypes - AlgoriSync</title>
+    <style>
+        :root {
+            --primary: #0d47a1;
+            --primary-light: #1976d2;
+            --accent: #ff6f00;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(160deg, #0d47a1 0%, #1565c0 40%, #1976d2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 60px 20px;
+            color: white;
+        }
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            font-size: 18px;
+            opacity: 0.7;
+            margin-bottom: 48px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            max-width: 1200px;
+            width: 100%;
+        }
+        .card {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 16px;
+            padding: 32px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s;
+        }
+        .card:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+        }
+        .card-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        .card h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .card p {
+            font-size: 14px;
+            opacity: 0.7;
+            line-height: 1.5;
+        }
+        .card .formats {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        .format-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .svg-badge { background: #69f0ae; color: #0a0e27; }
+        .html-badge { background: #ff6f00; color: white; }
+        .footer {
+            margin-top: 48px;
+            text-align: center;
+            opacity: 0.5;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>EQMS Prototypes</h1>
+    <p class="subtitle">AlgoriSync Queue Management System - UI Mockups</p>
+
+    <div class="grid">
+        <a href="html/01-kiosk.html" class="card">
+            <div class="card-icon">🎫</div>
+            <h2>Kiosk Screen</h2>
+            <p>Public ticket generation screen. Patients/visitors press the button to get a queue ticket with automatic receipt printing.</p>
+            <div class="formats">
+                <span class="format-badge svg-badge">SVG</span>
+                <span class="format-badge html-badge">HTML</span>
+            </div>
+        </a>
+
+        <a href="html/02-display-board.html" class="card">
+            <div class="card-icon">📺</div>
+            <h2>Display Board</h2>
+            <p>Full waiting area display. Shows recent calls (left) with advertising area (right). Real-time updates via WebSocket.</p>
+            <div class="formats">
+                <span class="format-badge svg-badge">SVG</span>
+                <span class="format-badge html-badge">HTML</span>
+            </div>
+        </a>
+
+        <a href="html/03-counter-dashboard.html" class="card">
+            <div class="card-icon">💻</div>
+            <h2>Counter Dashboard</h2>
+            <p>Staff interface for counter operators. View currently serving, select tickets from queue, call/recall/complete actions.</p>
+            <div class="formats">
+                <span class="format-badge svg-badge">SVG</span>
+                <span class="format-badge html-badge">HTML</span>
+            </div>
+        </a>
+
+        <a href="html/04-counter-display.html" class="card">
+            <div class="card-icon">🖥️</div>
+            <h2>Counter Display</h2>
+            <p>Single counter screen for the waiting area. Shows which ticket number should proceed to which counter.</p>
+            <div class="formats">
+                <span class="format-badge svg-badge">SVG</span>
+                <span class="format-badge html-badge">HTML</span>
+            </div>
+        </a>
+
+        <a href="html/05-login.html" class="card">
+            <div class="card-icon">🔐</div>
+            <h2>Login Page</h2>
+            <p>Staff authentication screen. Counter operators log in to access their assigned dashboard.</p>
+            <div class="formats">
+                <span class="format-badge svg-badge">SVG</span>
+                <span class="format-badge html-badge">HTML</span>
+            </div>
+        </a>
+    </div>
+
+    <div class="footer">
+        <p>EQMS-AlgoriSync &copy; 2026 &mdash; Click any card to view the HTML prototype</p>
+    </div>
+</body>
+</html>

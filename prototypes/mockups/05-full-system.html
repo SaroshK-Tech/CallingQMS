@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, initial-scale=1.0">
+    <title>EQMS Mockup - Full System Overview</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0a0e27;
+        }
+
+        .scene {
+            width: 1920px;
+            height: 1080px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background gradient */
+        .bg {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, #0a0e27 0%, #111833 50%, #0d1b3e 100%);
+        }
+
+        /* Grid pattern */
+        .grid-pattern {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Title */
+        .title {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 10;
+        }
+        .title h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+        }
+        .title p {
+            font-size: 16px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* === FLOOR PLAN === */
+        .floor-plan {
+            position: absolute;
+            top: 160px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1400px;
+            height: 700px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            background: rgba(255,255,255,0.02);
+        }
+
+        /* Zone labels */
+        .zone {
+            position: absolute;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* === DEVICE NODES === */
+        .device {
+            position: absolute;
+            text-align: center;
+            z-index: 10;
+        }
+
+        /* Device frame */
+        .device-frame {
+            background: rgba(255,255,255,0.08);
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.3s;
+        }
+        .device-frame:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: rgba(255,255,255,0.25);
+            transform: scale(1.02);
+        }
+
+        /* Screen inside device */
+        .device-screen {
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        /* Device label */
+        .device-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
+        }
+        .device-desc {
+            font-size: 10px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* === KIOSK DEVICE === */
+        .device-kiosk {
+            left: 80px;
+            top: 200px;
+        }
+        .device-kiosk .device-frame {
+            width: 180px;
+        }
+        .device-kiosk .device-screen {
+            width: 150px;
+            height: 200px;
+            background: linear-gradient(160deg, #0d47a1, #1976d2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin: 0 auto;
+        }
+        .device-kiosk .screen-logo {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            opacity: 0.8;
+        }
+        .device-kiosk .screen-btn {
+            padding: 8px 20px;
+            background: #ff6f00;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            color: white;
+        }
+
+        /* === DISPLAY BOARD DEVICE === */
+        .device-display {
+            left: 50%;
+            transform: translateX(-50%);
+            top: 180px;
+        }
+        .device-display .device-frame {
+            width: 320px;
+        }
+        .device-display .device-screen {
+            width: 100%;
+            height: 160px;
+            background: linear-gradient(180deg, #0a0e27, #111833);
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            color: white;
+        }
+        .display-calls {
+            padding: 10px;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+        .display-calls .calls-title {
+            font-size: 7px;
+            color: #ff6f00;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .display-call {
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            padding: 6px;
+            margin-bottom: 4px;
+            border-left: 2px solid #69f0ae;
+        }
+        .display-call .call-num {
+            font-size: 14px;
+            font-weight: 900;
+            color: #69f0ae;
+        }
+        .display-call .call-counter {
+            font-size: 6px;
+            color: #ff6f00;
+        }
+        .display-ad {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.2);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* === COUNTER DISPLAY DEVICE === */
+        .device-counter-display {
+            right: 80px;
+            top: 200px;
+        }
+        .device-counter-display .device-frame {
+            width: 180px;
+        }
+        .device-counter-display .device-screen {
+            width: 150px;
+            height: 120px;
+            background: linear-gradient(180deg, #0a0e27, #111833);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin: 0 auto;
+        }
+        .device-counter-display .screen-ticket {
+            font-size: 36px;
+            font-weight: 900;
+            color: #69f0ae;
+        }
+        .device-counter-display .screen-name {
+            font-size: 8px;
+            color: #ff6f00;
+            margin-top: 4px;
+        }
+
+        /* === OPERATOR DASHBOARD DEVICE === */
+        .device-dashboard {
+            right: 80px;
+            top: 420px;
+        }
+        .device-dashboard .device-frame {
+            width: 200px;
+        }
+        .device-dashboard .device-screen {
+            width: 100%;
+            height: 120px;
+            background: #f0f2f5;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .dash-mini-header {
+            background: linear-gradient(135deg, #002171, #0d47a1);
+            color: white;
+            padding: 4px 8px;
+            font-size: 6px;
+            font-weight: 600;
+        }
+        .dash-mini-body {
+            padding: 6px;
+        }
+        .dash-mini-serving {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-radius: 4px;
+            padding: 4px;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+        .dash-mini-ticket {
+            font-size: 20px;
+            font-weight: 900;
+            color: #002171;
+        }
+        .dash-mini-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 3px;
+        }
+        .dash-mini-item {
+            background: #e8f5e9;
+            border-radius: 2px;
+            padding: 2px;
+            text-align: center;
+            font-size: 6px;
+            font-weight: 700;
+            color: #002171;
+        }
+
+        /* === CONNECTION ARROWS === */
+        .connection {
+            position: absolute;
+            z-index: 5;
+        }
+
+        /* Arrow line */
+        .arrow-line {
+            height: 2px;
+            background: linear-gradient(90deg, #69f0ae, #00e676);
+            position: relative;
+        }
+        .arrow-line::after {
+            content: '';
+            position: absolute;
+            right: -8px;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid #00e676;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        /* Connection: Kiosk -> Display */
+        .conn-1 {
+            left: 280px;
+            top: 310px;
+            width: 350px;
+            transform: rotate(-8deg);
+        }
+
+        /* Connection: Display -> Counter Display */
+        .conn-2 {
+            left: 850px;
+            top: 300px;
+            width: 250px;
+            transform: rotate(5deg);
+        }
+
+        /* Connection: Dashboard -> Counter Display */
+        .conn-3 {
+            right: 200px;
+            top: 440px;
+            width: 80px;
+            transform: rotate(90deg);
+        }
+
+        /* Flow labels */
+        .flow-label {
+            position: absolute;
+            background: rgba(105, 240, 174, 0.15);
+            border: 1px solid rgba(105, 240, 174, 0.3);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 600;
+            color: #69f0ae;
+            white-space: nowrap;
+            z-index: 6;
+        }
+
+        /* === DATA FLOW ANIMATION (CSS only) === */
+        .data-pulse {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #69f0ae;
+            border-radius: 50%;
+            box-shadow: 0 0 12px #69f0ae;
+            animation: pulse-move 3s linear infinite;
+        }
+        @keyframes pulse-move {
+            0% { left: 280px; top: 310px; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { left: 630px; top: 280px; opacity: 0; }
+        }
+
+        /* Legend */
+        .legend {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 32px;
+            z-index: 10;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+        }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .legend-dot.kiosk { background: #1976d2; }
+        .legend-dot.display { background: #ff6f00; }
+        .legend-dot.counter { background: #69f0ae; }
+        .legend-dot.dashboard { background: #e3f2fd; }
+
+        /* Room outlines */
+        .room {
+            position: absolute;
+            border: 2px dashed rgba(255,255,255,0.08);
+            border-radius: 8px;
+        }
+        .room-lobby {
+            left: 40px;
+            top: 180px;
+            width: 260px;
+            height: 320px;
+        }
+        .room-waiting {
+            left: 360px;
+            top: 180px;
+            width: 500px;
+            height: 320px;
+        }
+        .room-counter {
+            right: 40px;
+            top: 180px;
+            width: 300px;
+            height: 520px;
+        }
+
+        /* Chair icons in waiting area */
+        .mini-chair {
+            width: 20px;
+            height: 16px;
+            background: rgba(25, 118, 210, 0.3);
+            border-radius: 3px;
+            position: absolute;
+        }
+
+        /* Flow steps at bottom */
+        .flow-steps {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            z-index: 10;
+        }
+        .flow-step {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 10px 16px;
+            text-align: center;
+        }
+        .flow-step .step-num {
+            font-size: 20px;
+            font-weight: 900;
+            color: #69f0ae;
+        }
+        .flow-step .step-text {
+            font-size: 10px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 2px;
+        }
+        .flow-arrow {
+            font-size: 18px;
+            color: rgba(255,255,255,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="scene">
+        <div class="bg"></div>
+        <div class="grid-pattern"></div>
+
+        <!-- Title -->
+        <div class="title">
+            <h1>EQMS System Overview</h1>
+            <p>AlgoriSync Electronic Queue Management System - Complete Workflow</p>
+        </div>
+
+        <!-- Floor Plan -->
+        <div class="floor-plan">
+            <!-- Room outlines -->
+            <div class="room room-lobby"></div>
+            <div class="room room-waiting"></div>
+            <div class="room room-counter"></div>
+
+            <!-- Zone labels -->
+            <div class="zone" style="left: 100px; top: 12px;">Lobby / Entrance</div>
+            <div class="zone" style="left: 520px; top: 12px;">Waiting Area</div>
+            <div class="zone" style="right: 100px; top: 12px;">Counter Area</div>
+
+            <!-- Mini chairs in waiting area -->
+            <div class="mini-chair" style="left: 400px; top: 350px;"></div>
+            <div class="mini-chair" style="left: 430px; top: 350px;"></div>
+            <div class="mini-chair" style="left: 460px; top: 350px;"></div>
+            <div class="mini-chair" style="left: 490px; top: 350px;"></div>
+            <div class="mini-chair" style="left: 520px; top: 350px;"></div>
+            <div class="mini-chair" style="left: 550px; top: 350px;"></div>
+
+            <!-- KIOSK -->
+            <div class="device device-kiosk">
+                <div class="device-frame">
+                    <div class="device-screen">
+                        <div class="screen-logo">EQMS</div>
+                        <div style="font-size:6px; opacity:0.7; margin-bottom:8px;">ALGORISYNC</div>
+                        <div class="screen-btn">GET TICKET</div>
+                    </div>
+                </div>
+                <div class="device-label">Kiosk Terminal</div>
+                <div class="device-desc">Patient gets ticket</div>
+            </div>
+
+            <!-- DISPLAY BOARD -->
+            <div class="device device-display">
+                <div class="device-frame">
+                    <div class="device-screen">
+                        <div class="display-calls">
+                            <div class="calls-title">Recent Calls</div>
+                            <div class="display-call">
+                                <div class="call-num">A-012</div>
+                                <div class="call-counter">Counter 1</div>
+                            </div>
+                            <div class="display-call">
+                                <div class="call-num">A-011</div>
+                                <div class="call-counter">Counter 2</div>
+                            </div>
+                            <div class="display-call">
+                                <div class="call-num">B-005</div>
+                                <div class="call-counter">Counter 3</div>
+                            </div>
+                        </div>
+                        <div class="display-ad">AD AREA</div>
+                    </div>
+                </div>
+                <div class="device-label">Display Board (55")</div>
+                <div class="device-desc">Shows called tickets + ads</div>
+            </div>
+
+            <!-- COUNTER DISPLAY -->
+            <div class="device device-counter-display">
+                <div class="device-frame">
+                    <div class="device-screen">
+                        <div class="screen-ticket">A-012</div>
+                        <div class="screen-name">Counter 1</div>
+                    </div>
+                </div>
+                <div class="device-label">Counter Display</div>
+                <div class="device-desc">Shows at counter window</div>
+            </div>
+
+            <!-- OPERATOR DASHBOARD -->
+            <div class="device device-dashboard">
+                <div class="device-frame">
+                    <div class="device-screen">
+                        <div class="dash-mini-header">EQMS Dashboard</div>
+                        <div class="dash-mini-body">
+                            <div class="dash-mini-serving">
+                                <div style="font-size:5px; color:#64748b;">Now Serving</div>
+                                <div class="dash-mini-ticket">A-012</div>
+                            </div>
+                            <div class="dash-mini-grid">
+                                <div class="dash-mini-item">A-001</div>
+                                <div class="dash-mini-item">A-002</div>
+                                <div class="dash-mini-item">A-003</div>
+                                <div class="dash-mini-item">A-004</div>
+                                <div class="dash-mini-item">A-005</div>
+                                <div class="dash-mini-item">A-006</div>
+                                <div class="dash-mini-item">B-001</div>
+                                <div class="dash-mini-item">B-002</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="device-label">Operator Dashboard</div>
+                <div class="device-desc">Staff manages queue</div>
+            </div>
+
+            <!-- Connections -->
+            <div class="connection conn-1">
+                <div class="arrow-line" style="width: 100%;"></div>
+            </div>
+            <div class="connection conn-2">
+                <div class="arrow-line" style="width: 100%;"></div>
+            </div>
+            <div class="connection conn-3">
+                <div class="arrow-line" style="width: 100%;"></div>
+            </div>
+
+            <!-- Flow labels -->
+            <div class="flow-label" style="left: 340px; top: 260px;">1. Ticket Created</div>
+            <div class="flow-label" style="left: 750px; top: 260px;">2. Called via WebSocket</div>
+            <div class="flow-label" style="right: 60px; top: 380px;">3. Real-time Update</div>
+
+            <!-- Data pulse animation -->
+            <div class="data-pulse"></div>
+        </div>
+
+        <!-- Flow Steps -->
+        <div class="flow-steps">
+            <div class="flow-step">
+                <div class="step-num">1</div>
+                <div class="step-text">Patient takes ticket at kiosk</div>
+            </div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-step">
+                <div class="step-num">2</div>
+                <div class="step-text">Ticket appears on display board</div>
+            </div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-step">
+                <div class="step-num">3</div>
+                <div class="step-text">Staff calls ticket from dashboard</div>
+            </div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-step">
+                <div class="step-num">4</div>
+                <div class="step-text">Counter screen shows ticket number</div>
+            </div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-step">
+                <div class="step-num">5</div>
+                <div class="step-text">Patient proceeds to counter</div>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-dot kiosk"></div>
+                Kiosk Terminal
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot display"></div>
+                Display Board
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot counter"></div>
+                Counter Display
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot dashboard"></div>
+                Operator Dashboard
+            </div>
+        </div>
+    </div>
+</body>
+</html>

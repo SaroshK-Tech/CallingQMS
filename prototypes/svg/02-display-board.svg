@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0e27"/>
+      <stop offset="100%" style="stop-color:#111833"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="url(#bgGrad)"/>
+
+  <!-- Left Panel: Recent Calls (25% width) -->
+  <rect x="0" y="0" width="480" height="1080" fill="rgba(255,255,255,0.03)"/>
+  <line x1="480" y1="0" x2="480" y2="1080" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+
+  <!-- Recent Calls Header -->
+  <text x="240" y="65" text-anchor="middle" fill="#ff6f00" font-family="Segoe UI, sans-serif" font-size="16" font-weight="600" letter-spacing="3">RECENT CALLS</text>
+  <line x1="40" y1="85" x2="440" y2="85" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+
+  <!-- Call Card 1 (Active - green border) -->
+  <rect x="20" y="110" width="440" height="180" rx="12" fill="rgba(255,111,0,0.1)"/>
+  <rect x="20" y="110" width="4" height="180" fill="#69f0ae" rx="2"/>
+  <text x="240" y="195" text-anchor="middle" fill="#69f0ae" font-family="Segoe UI, sans-serif" font-size="52" font-weight="900" letter-spacing="2">A-012</text>
+  <text x="240" y="240" text-anchor="middle" fill="#ff6f00" font-family="Segoe UI, sans-serif" font-size="18" font-weight="600">Counter 1 - General</text>
+  <text x="240" y="270" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-family="Segoe UI, sans-serif" font-size="14">14:32:05</text>
+
+  <!-- Call Card 2 -->
+  <rect x="20" y="310" width="440" height="160" rx="12" fill="rgba(255,255,255,0.05)"/>
+  <rect x="20" y="310" width="4" height="160" fill="#ff6f00" rx="2"/>
+  <text x="240" y="385" text-anchor="middle" fill="#69f0ae" font-family="Segoe UI, sans-serif" font-size="44" font-weight="900" letter-spacing="2">A-011</text>
+  <text x="240" y="425" text-anchor="middle" fill="#ff6f00" font-family="Segoe UI, sans-serif" font-size="16" font-weight="600">Counter 2 - VIP</text>
+  <text x="240" y="455" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-family="Segoe UI, sans-serif" font-size="13">14:28:12</text>
+
+  <!-- Call Card 3 -->
+  <rect x="20" y="490" width="440" height="160" rx="12" fill="rgba(255,255,255,0.05)"/>
+  <rect x="20" y="490" width="4" height="160" fill="#ff6f00" rx="2"/>
+  <text x="240" y="565" text-anchor="middle" fill="#69f0ae" font-family="Segoe UI, sans-serif" font-size="44" font-weight="900" letter-spacing="2">B-005</text>
+  <text x="240" y="605" text-anchor="middle" fill="#ff6f00" font-family="Segoe UI, sans-serif" font-size="16" font-weight="600">Counter 3 - X-Ray</text>
+  <text x="240" y="635" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-family="Segoe UI, sans-serif" font-size="13">14:24:48</text>
+
+  <!-- Call Card 4 -->
+  <rect x="20" y="670" width="440" height="160" rx="12" fill="rgba(255,255,255,0.05)"/>
+  <rect x="20" y="670" width="4" height="160" fill="#ff6f00" rx="2"/>
+  <text x="240" y="745" text-anchor="middle" fill="#69f0ae" font-family="Segoe UI, sans-serif" font-size="44" font-weight="900" letter-spacing="2">A-010</text>
+  <text x="240" y="785" text-anchor="middle" fill="#ff6f00" font-family="Segoe UI, sans-serif" font-size="16" font-weight="600">Counter 1 - General</text>
+  <text x="240" y="815" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-family="Segoe UI, sans-serif" font-size="13">14:20:30</text>
+
+  <!-- Right Panel: Advertising Area (75% width) -->
+  <rect x="480" y="0" width="1440" height="1080" fill="transparent"/>
+
+  <!-- Ad placeholder -->
+  <rect x="520" y="60" width="1360" height="960" rx="16" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" stroke-width="1" stroke-dasharray="8,4"/>
+  
+  <!-- Ad content placeholder -->
+  <text x="1200" y="500" text-anchor="middle" fill="rgba(255,255,255,0.15)" font-family="Segoe UI, sans-serif" font-size="72" font-weight="700">ADVERTISING</text>
+  <text x="1200" y="560" text-anchor="middle" fill="rgba(255,255,255,0.1)" font-family="Segoe UI, sans-serif" font-size="24">Images / Videos / Promotions</text>
+
+  <!-- AlgoriSync watermark -->
+  <text x="1200" y="980" text-anchor="middle" fill="rgba(255,255,255,0.08)" font-family="Segoe UI, sans-serif" font-size="16">AlgoriSync Queue Management</text>
+</svg>

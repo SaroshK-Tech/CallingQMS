@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, initial-scale=1.0">
+    <title>EQMS Mockup - Counter Operator Desk</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .scene {
+            width: 1920px;
+            height: 1080px;
+            position: relative;
+            overflow: hidden;
+            background: #f0f2f5;
+        }
+
+        /* Office wall */
+        .wall {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 600px;
+            background: linear-gradient(180deg, #e8eaed 0%, #dde0e4 100%);
+        }
+
+        /* Wall shelf */
+        .wall-shelf {
+            position: absolute;
+            top: 200px;
+            right: 200px;
+            width: 200px;
+            height: 8px;
+            background: #8d6e63;
+            border-radius: 2px;
+        }
+        .shelf-item {
+            position: absolute;
+            bottom: 8px;
+            width: 30px;
+            height: 40px;
+            border-radius: 4px;
+        }
+        .shelf-item:nth-child(1) { left: 20px; background: #1976d2; }
+        .shelf-item:nth-child(2) { left: 60px; background: #4caf50; height: 35px; }
+        .shelf-item:nth-child(3) { left: 100px; background: #ff9800; height: 45px; }
+        .shelf-item:nth-child(4) { left: 140px; background: #9c27b0; height: 30px; }
+
+        /* Wall clock */
+        .wall-clock {
+            position: absolute;
+            top: 120px;
+            right: 500px;
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            border: 4px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .clock-hand-h {
+            width: 3px;
+            height: 20px;
+            background: #333;
+            position: absolute;
+            bottom: 50%;
+            transform-origin: bottom;
+            transform: rotate(30deg);
+        }
+        .clock-hand-m {
+            width: 2px;
+            height: 28px;
+            background: #666;
+            position: absolute;
+            bottom: 50%;
+            transform-origin: bottom;
+            transform: rotate(180deg);
+        }
+        .clock-center {
+            width: 6px;
+            height: 6px;
+            background: #333;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        /* Floor */
+        .floor {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 480px;
+            background: linear-gradient(180deg, #c4bdb4 0%, #b8b0a8 100%);
+        }
+        .floor-tiles {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px),
+                linear-gradient(180deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+            background-size: 80px 80px;
+        }
+
+        /* === DESK === */
+        .desk {
+            position: absolute;
+            bottom: 280px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+        .desk-surface {
+            width: 800px;
+            height: 20px;
+            background: linear-gradient(180deg, #a1887f, #8d6e63);
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .desk-front {
+            width: 800px;
+            height: 180px;
+            background: linear-gradient(180deg, #8d6e63, #795548);
+            border-radius: 0 0 4px 4px;
+        }
+        .desk-drawer {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            width: 150px;
+            height: 60px;
+            background: #6d4c41;
+            border-radius: 4px;
+            border: 1px solid #5d4037;
+        }
+        .desk-drawer::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 4px;
+            background: #8d6e63;
+            border-radius: 2px;
+        }
+
+        /* === MONITOR ON DESK === */
+        .monitor-container {
+            position: absolute;
+            bottom: 480px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 15;
+        }
+
+        /* Monitor stand */
+        .monitor-stand {
+            width: 80px;
+            height: 60px;
+            background: linear-gradient(180deg, #444, #333);
+            margin: 0 auto;
+            clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+        }
+        .monitor-base {
+            width: 140px;
+            height: 12px;
+            background: #333;
+            border-radius: 6px;
+            margin: 0 auto;
+        }
+
+        /* Monitor frame */
+        .monitor-frame {
+            width: 680px;
+            height: 440px;
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 
+                0 16px 48px rgba(0,0,0,0.3),
+                0 0 0 1px rgba(255,255,255,0.05);
+            position: relative;
+        }
+        .monitor-frame::before {
+            content: 'DELL';
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 8px;
+            color: #555;
+            letter-spacing: 3px;
+        }
+        .monitor-frame::after {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background: #2e7d32;
+            border-radius: 50%;
+        }
+
+        /* Screen - Dashboard */
+        .monitor-screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Dashboard Header */
+        .dash-header {
+            background: linear-gradient(135deg, #002171, #0d47a1);
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .dash-header h1 { font-size: 12px; font-weight: 600; }
+        .user-info { display: flex; align-items: center; gap: 10px; font-size: 10px; }
+        .counter-badge {
+            background: #ff6f00;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 10px;
+        }
+
+        /* Dashboard Body */
+        .dash-body {
+            flex: 1;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Currently Serving */
+        .serving-box {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+        .serving-label { font-size: 10px; color: #64748b; margin-bottom: 4px; }
+        .serving-ticket { font-size: 56px; font-weight: 900; color: #002171; letter-spacing: 3px; line-height: 1; }
+        .serving-counter { font-size: 11px; color: #0d47a1; font-weight: 600; margin-top: 4px; }
+
+        /* Action Buttons */
+        .action-row {
+            display: flex;
+            gap: 8px;
+        }
+        .action-btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-recall { background: linear-gradient(135deg, #ff9800, #e65100); }
+        .btn-next { background: linear-gradient(135deg, #1976d2, #0d47a1); }
+        .btn-done { background: linear-gradient(135deg, #00c853, #00897b); }
+
+        /* Ticket Grid */
+        .ticket-section {
+            flex: 1;
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+        }
+        .ticket-section h2 {
+            font-size: 10px;
+            font-weight: 700;
+            color: #1a1a2e;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .ticket-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+        }
+        .ticket-item {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            border-radius: 6px;
+            padding: 8px 4px;
+            text-align: center;
+        }
+        .ticket-item.selected {
+            background: linear-gradient(135deg, #bbdefb, #90caf9);
+            border: 2px solid #0d47a1;
+        }
+        .ticket-num { font-size: 14px; font-weight: 900; color: #002171; }
+        .ticket-svc { font-size: 7px; color: #64748b; margin-top: 2px; }
+
+        /* === KEYBOARD & MOUSE === */
+        .keyboard {
+            position: absolute;
+            bottom: 300px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 70px;
+            background: #2a2a2a;
+            border-radius: 6px;
+            z-index: 12;
+        }
+        .keyboard::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 8px,
+                    rgba(255,255,255,0.03) 8px,
+                    rgba(255,255,255,0.03) 9px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 12px,
+                    rgba(255,255,255,0.03) 12px,
+                    rgba(255,255,255,0.03) 13px
+                );
+            border-radius: 4px;
+        }
+
+        .mouse {
+            position: absolute;
+            bottom: 310px;
+            left: calc(50% + 140px);
+            width: 30px;
+            height: 45px;
+            background: #2a2a2a;
+            border-radius: 15px 15px 20px 20px;
+            z-index: 12;
+        }
+        .mouse::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1px;
+            height: 15px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* === OFFICE CHAIR === */
+        .chair {
+            position: absolute;
+            bottom: 180px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+        }
+        .chair-back {
+            width: 120px;
+            height: 100px;
+            background: #1a1a2e;
+            border-radius: 20px 20px 0 0;
+            margin: 0 auto;
+        }
+        .chair-seat {
+            width: 140px;
+            height: 20px;
+            background: #1a1a2e;
+            border-radius: 4px;
+            margin: 0 auto;
+        }
+        .chair-base {
+            width: 60px;
+            height: 40px;
+            position: relative;
+            margin: 0 auto;
+        }
+        .chair-pole {
+            width: 8px;
+            height: 40px;
+            background: #444;
+            margin: 0 auto;
+        }
+        .chair-wheels {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: -4px;
+        }
+        .wheel {
+            width: 12px;
+            height: 12px;
+            background: #333;
+            border-radius: 50%;
+        }
+
+        /* === PRINTER === */
+        .printer {
+            position: absolute;
+            bottom: 480px;
+            left: calc(50% + 380px);
+            z-index: 12;
+        }
+        .printer-body {
+            width: 80px;
+            height: 50px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        .printer-tray {
+            width: 60px;
+            height: 4px;
+            background: #bbb;
+            margin: 0 auto;
+            margin-top: -2px;
+        }
+        .printer-paper {
+            width: 50px;
+            height: 20px;
+            background: white;
+            margin: 0 auto;
+            margin-top: 2px;
+            border-radius: 0 0 2px 2px;
+            font-size: 5px;
+            color: #333;
+            text-align: center;
+            padding-top: 4px;
+            line-height: 1.2;
+        }
+
+        /* Annotation */
+        .annotation {
+            position: absolute;
+            background: white;
+            padding: 14px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            font-size: 13px;
+            color: #1a1a2e;
+            max-width: 240px;
+            line-height: 1.4;
+            z-index: 20;
+        }
+        .annotation strong {
+            color: #0d47a1;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .annotation-monitor {
+            top: 100px;
+            left: 100px;
+        }
+
+        /* Bottom label */
+        .label {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 20;
+        }
+        .label .dot {
+            width: 8px;
+            height: 8px;
+            background: #69f0ae;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="scene">
+        <!-- Environment -->
+        <div class="wall">
+            <div class="wall-shelf">
+                <div class="shelf-item"></div>
+                <div class="shelf-item"></div>
+                <div class="shelf-item"></div>
+                <div class="shelf-item"></div>
+            </div>
+            <div class="wall-clock">
+                <div class="clock-hand-h"></div>
+                <div class="clock-hand-m"></div>
+                <div class="clock-center"></div>
+            </div>
+        </div>
+        <div class="floor">
+            <div class="floor-tiles"></div>
+        </div>
+
+        <!-- Desk -->
+        <div class="desk">
+            <div class="desk-surface"></div>
+            <div class="desk-front">
+                <div class="desk-drawer"></div>
+            </div>
+        </div>
+
+        <!-- Monitor -->
+        <div class="monitor-container">
+            <div class="monitor-frame">
+                <div class="monitor-screen">
+                    <!-- Dashboard Header -->
+                    <div class="dash-header">
+                        <h1>EQMS Counter Dashboard</h1>
+                        <div class="user-info">
+                            <span class="counter-badge">Counter 1</span>
+                            <span>John Doe</span>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Body -->
+                    <div class="dash-body">
+                        <!-- Currently Serving -->
+                        <div class="serving-box">
+                            <div class="serving-label">Now Serving</div>
+                            <div class="serving-ticket">A-012</div>
+                            <div class="serving-counter">Counter 1 - General</div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-row">
+                            <button class="action-btn btn-recall">Recall</button>
+                            <button class="action-btn btn-next">Next</button>
+                            <button class="action-btn btn-done">Done</button>
+                        </div>
+
+                        <!-- Ticket Grid -->
+                        <div class="ticket-section">
+                            <h2>Waiting Tickets</h2>
+                            <div class="ticket-grid">
+                                <div class="ticket-item"><div class="ticket-num">A-001</div><div class="ticket-svc">General</div></div>
+                                <div class="ticket-item"><div class="ticket-num">A-002</div><div class="ticket-svc">General</div></div>
+                                <div class="ticket-item"><div class="ticket-num">A-003</div><div class="ticket-svc">General</div></div>
+                                <div class="ticket-item"><div class="ticket-num">A-004</div><div class="ticket-svc">General</div></div>
+                                <div class="ticket-item"><div class="ticket-num">A-005</div><div class="ticket-svc">General</div></div>
+                                <div class="ticket-item selected"><div class="ticket-num">A-006</div><div class="ticket-svc">General</div></div>
+                                <div class="ticket-item"><div class="ticket-num">A-007</div><div class="ticket-svc">General</div></div>
+                                <div class="ticket-item"><div class="ticket-num">A-008</div><div class="ticket-svc">General</div></div>
+                                <div class="ticket-item"><div class="ticket-num">A-009</div><div class="ticket-svc">General</div></div>
+                                <div class="ticket-item"><div class="ticket-num">A-010</div><div class="ticket-svc">General</div></div>
+                                <div class="ticket-item"><div class="ticket-num">A-011</div><div class="ticket-svc">General</div></div>
+                                <div class="ticket-item"><div class="ticket-num">B-001</div><div class="ticket-svc">VIP</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="monitor-stand"></div>
+            <div class="monitor-base"></div>
+        </div>
+
+        <!-- Keyboard & Mouse -->
+        <div class="keyboard"></div>
+        <div class="mouse"></div>
+
+        <!-- Printer -->
+        <div class="printer">
+            <div class="printer-body"></div>
+            <div class="printer-tray"></div>
+            <div class="printer-paper">A-012<br>General</div>
+        </div>
+
+        <!-- Office Chair -->
+        <div class="chair">
+            <div class="chair-back"></div>
+            <div class="chair-seat"></div>
+            <div class="chair-pole"></div>
+            <div class="chair-wheels">
+                <div class="wheel"></div>
+                <div class="wheel"></div>
+                <div class="wheel"></div>
+            </div>
+        </div>
+
+        <!-- Annotation -->
+        <div class="annotation annotation-monitor">
+            <strong>Counter Operator Dashboard</strong>
+            Staff login to manage their counter. Select tickets from the queue, call/recall/complete patients. Real-time WebSocket updates.
+        </div>
+
+        <!-- Bottom label -->
+        <div class="label">
+            <div class="dot"></div>
+            EQMS-AlgoriSync &mdash; Counter Operator Workstation
+        </div>
+    </div>
+</body>
+</html>

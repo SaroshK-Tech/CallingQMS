@@ -11,6 +11,8 @@ import subprocess
 import sys
 import threading
 
+from core.number_words import number_tokens
+
 AUDIO_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'audio')
 CHIME = os.path.join(AUDIO_DIR, 'chime.wav')
 
@@ -23,16 +25,34 @@ def _slug(name):
     return re.sub(r'[^a-z0-9]+', '_', name.strip().lower())
 
 
+def _number_files(number, lang):
+    """Audio clips for a ticket's numeric part, spoken as a whole number."""
+    try:
+        value = int(number)
+    except (TypeError, ValueError):
+        return []
+    return [
+        os.path.join(AUDIO_DIR, f'{lang}_n_{token}.mp3')
+        for token in number_tokens(value, lang)
+    ]
+
+
 def _build_file_list(ticket_number, counter_name, lang):
-    series = ticket_number[0] if ticket_number else ''
-    digits = ticket_number[1:] if ticket_number else ''
+    match = re.match(r'^([A-Za-z]*)(\d+)$', ticket_number or '')
+    if match:
+        series, digits = match.groups()
+    else:
+        series = (ticket_number or '')[:1]
+        digits = (ticket_number or '')[1:]
+
     files = [os.path.join(AUDIO_DIR, f'{lang}_ticket.mp3')]
     if series:
         files.append(os.path.join(AUDIO_DIR, f'{lang}_{series}.mp3'))
-    for d in digits:
-        files.append(os.path.join(AUDIO_DIR, f'{lang}_{d}.mp3'))
+    files += _number_files(digits, lang)
     files.append(os.path.join(AUDIO_DIR, f'{lang}_please_proceed_to.mp3'))
     files.append(os.path.join(AUDIO_DIR, f'{lang}_counter_{_slug(counter_name)}.mp3'))
+    if lang == 'ur':
+        files.append(os.path.join(AUDIO_DIR, 'ur_go_to.mp3'))
     return files
 
 
@@ -69,8 +89,9 @@ def _play_wait(path):
 
 
 def announce(ticket_number, counter_name):
-    """Queue the chime + English announcement for a ticket call."""
+    """Queue the chime + English + Urdu announcements for a ticket call."""
     files = [CHIME]
     files += _build_file_list(ticket_number, counter_name, 'en')
+    files += _build_file_list(ticket_number, counter_name, 'ur')
     _queue.put(files)
     _ensure_worker()

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EQMS Counter Display - Prototype</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; width: 100%; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .counter-display {
+            height: 100%;
+            background: linear-gradient(180deg, #0a0e27 0%, #111833 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+        }
+        .logo-placeholder {
+            width: 130px;
+            height: 130px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 34px;
+        }
+        .counter-name {
+            font-size: 36px;
+            color: #ff6f00;
+            font-weight: 600;
+        }
+        .current-ticket {
+            font-size: 170px;
+            font-weight: 900;
+            color: #69f0ae;
+            text-shadow: 0 0 60px rgba(105, 240, 174, 0.4);
+            letter-spacing: 8px;
+            line-height: 1;
+            margin-top: 26px;
+        }
+        .please-proceed {
+            font-size: 22px;
+            margin-top: 32px;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+        .prototype-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: #69f0ae;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 100;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="prototype-badge">PROTOTYPE</div>
+    <div class="counter-display">
+        <div class="logo-placeholder">EQMS</div>
+        <div class="counter-name">Counter 1 - General</div>
+        <div class="current-ticket">A-012</div>
+        <div class="please-proceed">Please Proceed to Counter</div>
+    </div>
+</body>
+</html>

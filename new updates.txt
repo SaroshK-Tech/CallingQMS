@@ -1,0 +1,3 @@
+cash is like a main counter it should have button to terminate client (cancelled ticket) also after the confirmation from cash  all other stations (in main category) should display the client 
+
+if need any further explaination asked

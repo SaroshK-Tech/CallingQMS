@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EQMS Display Board - Prototype</title>
+    <style>
+        :root {
+            --accent: #ff6f00;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; width: 100%; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .display-board {
+            height: 100%;
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            background: linear-gradient(180deg, #0a0e27 0%, #111833 100%);
+            color: white;
+        }
+        .recent-calls {
+            background: rgba(255,255,255,0.03);
+            padding: 32px 24px;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .recent-calls h2 {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .call-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--accent);
+            flex: 1 1 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .call-card:first-child {
+            background: rgba(255,111,0,0.1);
+            border-left-color: #69f0ae;
+        }
+        .call-card .ticket-num {
+            font-size: 42px;
+            font-weight: 900;
+            color: #69f0ae;
+            letter-spacing: 2px;
+        }
+        .call-card .counter-name {
+            font-size: 15px;
+            color: var(--accent);
+            margin-top: 6px;
+            font-weight: 600;
+        }
+        .call-card .time {
+            font-size: 13px;
+            color: rgba(255,255,255,0.4);
+            margin-top: 4px;
+        }
+        .advertising-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px;
+        }
+        .ad-placeholder {
+            width: 100%;
+            height: 100%;
+            border: 2px dashed rgba(255,255,255,0.15);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.2);
+        }
+        .ad-placeholder .title {
+            font-size: 72px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .ad-placeholder .subtitle {
+            font-size: 24px;
+        }
+        .prototype-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: #69f0ae;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 100;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="prototype-badge">PROTOTYPE</div>
+    <div class="display-board">
+        <!-- Recent Calls Panel -->
+        <div class="recent-calls">
+            <h2>Recent Calls</h2>
+            
+            <div class="call-card">
+                <div class="ticket-num">A-012</div>
+                <div class="counter-name">Counter 1 - General</div>
+                <div class="time">14:32:05</div>
+            </div>
+
+            <div class="call-card">
+                <div class="ticket-num">A-011</div>
+                <div class="counter-name">Counter 2 - VIP</div>
+                <div class="time">14:28:12</div>
+            </div>
+
+            <div class="call-card">
+                <div class="ticket-num">B-005</div>
+                <div class="counter-name">Counter 3 - X-Ray</div>
+                <div class="time">14:24:48</div>
+            </div>
+
+            <div class="call-card">
+                <div class="ticket-num">A-010</div>
+                <div class="counter-name">Counter 1 - General</div>
+                <div class="time">14:20:30</div>
+            </div>
+        </div>
+
+        <!-- Advertising Area -->
+        <div class="advertising-area">
+            <div class="ad-placeholder">
+                <div class="title">ADVERTISING</div>
+                <div class="subtitle">Images / Videos / Promotions</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

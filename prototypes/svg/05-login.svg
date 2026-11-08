@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d47a1"/>
+      <stop offset="40%" style="stop-color:#1565c0"/>
+      <stop offset="100%" style="stop-color:#1976d2"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-20%" y="-10%" width="140%" height="130%">
+      <feDropShadow dx="0" dy="24" stdDeviation="40" flood-color="#000" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="url(#bgGrad)"/>
+
+  <!-- Login Card -->
+  <rect x="740" y="190" width="440" height="700" rx="20" fill="white" filter="url(#cardShadow)"/>
+
+  <!-- Logo -->
+  <circle cx="960" cy="320" r="50" fill="#e3f2fd"/>
+  <text x="960" y="335" text-anchor="middle" fill="#0d47a1" font-family="Segoe UI, sans-serif" font-size="28" font-weight="700">EQMS</text>
+
+  <!-- Title -->
+  <text x="960" y="420" text-anchor="middle" fill="#0d47a1" font-family="Segoe UI, sans-serif" font-size="24" font-weight="700">Queue Management System</text>
+
+  <!-- Username Field -->
+  <text x="780" y="500" fill="#1a1a2e" font-family="Segoe UI, sans-serif" font-size="14" font-weight="600">Username</text>
+  <rect x="780" y="515" width="360" height="50" rx="10" fill="white" stroke="#e2e8f0" stroke-width="2"/>
+  <text x="800" y="546" fill="#94a3b8" font-family="Segoe UI, sans-serif" font-size="16">Enter your username</text>
+
+  <!-- Password Field -->
+  <text x="780" y="600" fill="#1a1a2e" font-family="Segoe UI, sans-serif" font-size="14" font-weight="600">Password</text>
+  <rect x="780" y="615" width="360" height="50" rx="10" fill="white" stroke="#e2e8f0" stroke-width="2"/>
+  <text x="800" y="646" fill="#94a3b8" font-family="Segoe UI, sans-serif" font-size="16">Enter your password</text>
+
+  <!-- Login Button -->
+  <rect x="780" y="710" width="360" height="50" rx="10" fill="url(#bgGrad)"/>
+  <text x="960" y="742" text-anchor="middle" fill="white" font-family="Segoe UI, sans-serif" font-size="16" font-weight="700">Login</text>
+</svg>

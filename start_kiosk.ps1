@@ -31,7 +31,7 @@ Write-Host ""
 
 # Start Django server
 Write-Host "Starting Django server..." -ForegroundColor Yellow
-Start-Process -FilePath "cmd" -ArgumentList "/k", "cd /d `"$ProjectDir`" && python manage.py runserver 0.0.0.0:8000" -WindowStyle Normal
+Start-Process -FilePath "cmd" -ArgumentList "/k", "cd /d `"$ProjectDir`" && python manage.py runserver localhost:8000" -WindowStyle Normal
 
 Write-Host "Waiting for server to start..." -ForegroundColor Yellow
 Start-Sleep -Seconds 3
@@ -44,7 +44,7 @@ Write-Host ""
 Write-Host "============================================" -ForegroundColor Green
 Write-Host "       Kiosk is running!" -ForegroundColor Green
 Write-Host "============================================" -ForegroundColor Green
-Write-Host "URL:   http://localhost:8000" -ForegroundColor White
-Write-Host "Admin: http://localhost:8000/admin/" -ForegroundColor White
+Write-Host "URL:   http://127.0.0.1:8000" -ForegroundColor White
+Write-Host "Admin: http://127.0.0.1:8000/admin/" -ForegroundColor White
 Write-Host ""
 Read-Host "Press Enter to close this window"

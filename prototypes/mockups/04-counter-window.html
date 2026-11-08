@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, initial-scale=1.0">
+    <title>EQMS Mockup - Counter Window Screen</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .scene {
+            width: 1920px;
+            height: 1080px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Wall behind counter */
+        .wall {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 650px;
+            background: linear-gradient(180deg, #e8eaed 0%, #dde0e4 100%);
+        }
+
+        /* Counter partition wall */
+        .partition {
+            position: absolute;
+            bottom: 350px;
+            left: 0;
+            right: 0;
+            height: 300px;
+            background: linear-gradient(180deg, #b0bec5, #90a4ae);
+        }
+        .partition::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: #78909c;
+        }
+
+        /* Glass window */
+        .glass-window {
+            position: absolute;
+            bottom: 500px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 150px;
+            background: rgba(200, 230, 255, 0.3);
+            border: 3px solid #78909c;
+            border-radius: 4px;
+            backdrop-filter: blur(2px);
+        }
+        .glass-window::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 60px;
+            height: 100px;
+            background: rgba(255,255,255,0.2);
+            transform: skewX(-10deg);
+        }
+
+        /* Counter ledge */
+        .counter-ledge {
+            position: absolute;
+            bottom: 350px;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: #78909c;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        /* Customer floor area */
+        .floor-customer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 350px;
+            background: linear-gradient(180deg, #c8c0b8 0%, #b8b0a8 100%);
+        }
+        .floor-customer .floor-tiles {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px),
+                linear-gradient(180deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+            background-size: 100px 100px;
+        }
+
+        /* Staff floor area (behind counter) */
+        .floor-staff {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 0;
+        }
+
+        /* === COUNTER NUMBER SIGN === */
+        .counter-sign {
+            position: absolute;
+            bottom: 660px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0d47a1;
+            color: white;
+            padding: 12px 40px;
+            border-radius: 8px;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 16px rgba(13,71,161,0.4);
+            z-index: 10;
+        }
+
+        /* === SMALL MONITOR AT COUNTER === */
+        .counter-monitor {
+            position: absolute;
+            bottom: 680px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 15;
+        }
+
+        /* Monitor frame (smaller, 24") */
+        .monitor-frame {
+            width: 480px;
+            height: 300px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 8px;
+            box-shadow: 
+                0 12px 36px rgba(0,0,0,0.3),
+                0 0 0 1px rgba(255,255,255,0.05);
+            position: relative;
+        }
+        .monitor-frame::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background: #2e7d32;
+            border-radius: 50%;
+        }
+
+        /* Screen content - Counter Display */
+        .monitor-screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 4px;
+            overflow: hidden;
+            background: linear-gradient(180deg, #0a0e27 0%, #111833 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .screen-logo {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .screen-counter-name {
+            font-size: 20px;
+            color: #ff6f00;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        .screen-ticket {
+            font-size: 100px;
+            font-weight: 900;
+            color: #69f0ae;
+            text-shadow: 0 0 40px rgba(105, 240, 174, 0.4);
+            letter-spacing: 6px;
+            line-height: 1;
+        }
+        .screen-proceed {
+            font-size: 14px;
+            margin-top: 20px;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        /* Monitor stand */
+        .monitor-stand {
+            width: 60px;
+            height: 40px;
+            background: linear-gradient(180deg, #444, #333);
+            margin: 0 auto;
+            clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%);
+        }
+        .monitor-base {
+            width: 100px;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            margin: 0 auto;
+        }
+
+        /* === TICKET HOLDER/PRINTER === */
+        .ticket-holder {
+            position: absolute;
+            bottom: 680px;
+            left: calc(50% + 280px);
+            z-index: 12;
+        }
+        .holder-body {
+            width: 60px;
+            height: 40px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .holder-slot {
+            width: 40px;
+            height: 3px;
+            background: #999;
+            margin: 0 auto;
+            margin-top: 8px;
+        }
+
+        /* === WINDOW FRAME DETAILS === */
+        .window-frame-left {
+            position: absolute;
+            bottom: 500px;
+            left: calc(50% - 220px);
+            width: 8px;
+            height: 150px;
+            background: #78909c;
+        }
+        .window-frame-right {
+            position: absolute;
+            bottom: 500px;
+            left: calc(50% + 212px);
+            width: 8px;
+            height: 150px;
+            background: #78909c;
+        }
+        .window-frame-top {
+            position: absolute;
+            bottom: 642px;
+            left: calc(50% - 220px);
+            width: 440px;
+            height: 8px;
+            background: #78909c;
+        }
+
+        /* === QUEUE ROPE === */
+        .rope-post {
+            position: absolute;
+            bottom: 350px;
+            width: 12px;
+            height: 100px;
+            background: linear-gradient(90deg, #c0a060, #d4b878, #c0a060);
+            border-radius: 6px 6px 0 0;
+            z-index: 5;
+        }
+        .rope-post::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -4px;
+            width: 20px;
+            height: 16px;
+            background: #d4b878;
+            border-radius: 50%;
+        }
+        .rope-post-left {
+            left: 500px;
+        }
+        .rope-post-right {
+            left: calc(50% + 490px);
+        }
+        .rope {
+            position: absolute;
+            bottom: 440px;
+            left: 510px;
+            width: 980px;
+            height: 30px;
+            border-bottom: 4px solid #c0a060;
+            border-radius: 0 0 50% 50%;
+        }
+
+        /* Queue line markers on floor */
+        .queue-marker {
+            position: absolute;
+            bottom: 280px;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(13,71,161,0.3);
+            border-radius: 50%;
+            z-index: 2;
+        }
+        .queue-marker:nth-child(1) { left: 600px; }
+        .queue-marker:nth-child(2) { left: 700px; }
+        .queue-marker:nth-child(3) { left: 800px; }
+        .queue-marker:nth-child(4) { left: 900px; }
+        .queue-marker:nth-child(5) { left: 1000px; }
+
+        /* Annotation */
+        .annotation {
+            position: absolute;
+            background: white;
+            padding: 14px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            font-size: 13px;
+            color: #1a1a2e;
+            max-width: 240px;
+            line-height: 1.4;
+            z-index: 20;
+        }
+        .annotation strong {
+            color: #0d47a1;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .annotation-screen {
+            top: 80px;
+            right: 200px;
+        }
+
+        /* Bottom label */
+        .label {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 20;
+        }
+        .label .dot {
+            width: 8px;
+            height: 8px;
+            background: #69f0ae;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="scene">
+        <!-- Environment -->
+        <div class="wall"></div>
+        <div class="partition"></div>
+        <div class="counter-ledge"></div>
+        <div class="floor-customer">
+            <div class="floor-tiles"></div>
+        </div>
+
+        <!-- Glass window -->
+        <div class="window-frame-left"></div>
+        <div class="window-frame-right"></div>
+        <div class="window-frame-top"></div>
+        <div class="glass-window"></div>
+
+        <!-- Counter Number Sign -->
+        <div class="counter-sign">COUNTER 1</div>
+
+        <!-- Counter Monitor -->
+        <div class="counter-monitor">
+            <div class="monitor-frame">
+                <div class="monitor-screen">
+                    <div class="screen-logo">EQMS</div>
+                    <div class="screen-counter-name">Counter 1 - General</div>
+                    <div class="screen-ticket">A-012</div>
+                    <div class="screen-proceed">Please Proceed to Counter</div>
+                </div>
+            </div>
+            <div class="monitor-stand"></div>
+            <div class="monitor-base"></div>
+        </div>
+
+        <!-- Ticket holder -->
+        <div class="ticket-holder">
+            <div class="holder-body">
+                <div class="holder-slot"></div>
+            </div>
+        </div>
+
+        <!-- Queue rope -->
+        <div class="rope-post rope-post-left"></div>
+        <div class="rope-post rope-post-right"></div>
+        <div class="rope"></div>
+
+        <!-- Queue markers -->
+        <div class="queue-marker"></div>
+        <div class="queue-marker"></div>
+        <div class="queue-marker"></div>
+        <div class="queue-marker"></div>
+        <div class="queue-marker"></div>
+
+        <!-- Annotation -->
+        <div class="annotation annotation-screen">
+            <strong>Counter Window Display</strong>
+            Small monitor at each counter window showing the current ticket number. Patients see which ticket is being served and where to go.
+        </div>
+
+        <!-- Bottom label -->
+        <div class="label">
+            <div class="dot"></div>
+            EQMS-AlgoriSync &mdash; Counter Window Display
+        </div>
+    </div>
+</body>
+</html>

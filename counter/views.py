@@ -1,52 +1,77 @@
-from django.shortcuts import render, get_object_or_404
+import json
+
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.utils import timezone
-from core.models import Counter, Ticket, TicketCall
+from django.shortcuts import get_object_or_404, render
+from django.views.decorators.http import require_GET, require_POST
+
+from core import queueing
+from core.models import Counter, Feedback, Ticket, TicketCall
+
+
+def _profile_counter(request):
+    profile = getattr(request.user, 'counter_profile', None)
+    return profile.counter if profile else None
 
 
 @login_required
 def counter_dashboard(request):
-    profile = getattr(request.user, 'counter_profile', None)
-    if not profile:
+    counter = _profile_counter(request)
+    if not counter:
         return render(request, 'counter/no_counter.html')
-    
-    counter = profile.counter
-    services = counter.services.all()
 
-    # Tickets not yet finished (Done) by THIS counter stay in its list
-    served_ids = TicketCall.objects.filter(
-        counter=counter, served=True
-    ).values_list('ticket_id', flat=True)
-
-    waiting_tickets = Ticket.objects.filter(
-        service__in=services
-    ).exclude(
-        id__in=served_ids
-    ).exclude(
-        status__in=[Ticket.Status.COMPLETED, Ticket.Status.CANCELLED]
-    ).select_related('service').order_by('created_at')
-
-    currently_serving = Ticket.objects.filter(
-        calls__counter=counter,
-        calls__served=False,
-    ).exclude(
-        status__in=[Ticket.Status.COMPLETED, Ticket.Status.CANCELLED]
-    ).select_related('service').order_by('-called_at').first()
-
-    served_today = Ticket.objects.filter(
-        calls__counter=counter,
-        calls__served=True,
-        calls__called_at__date=timezone.localdate()
-    ).select_related('service').order_by('-called_at')[:20]
-    
     return render(request, 'counter/dashboard.html', {
         'counter': counter,
-        'services': services,
-        'service_ids': list(services.values_list('id', flat=True)),
-        'waiting_tickets': waiting_tickets,
-        'currently_serving': currently_serving,
-        'recent_completed': served_today,
+        'services': queueing.services_for_counter(counter),
+        'state': queueing.build_dashboard_state(counter),
+    })
+
+
+@login_required
+@require_GET
+def dashboard_state(request):
+    counter = _profile_counter(request)
+    if not counter:
+        return JsonResponse({'error': 'No counter assigned'}, status=403)
+    return JsonResponse(queueing.build_dashboard_state(counter))
+
+
+@login_required
+@require_POST
+def submit_feedback(request):
+    counter = _profile_counter(request)
+    if not counter:
+        return JsonResponse({'error': 'No counter assigned'}, status=403)
+
+    try:
+        data = json.loads(request.body or '{}')
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+    ticket = get_object_or_404(Ticket, id=data.get('ticket_id'))
+    if not TicketCall.objects.filter(ticket=ticket, counter=counter).exists():
+        return JsonResponse({'error': 'Ticket was not called at this counter'}, status=403)
+
+    try:
+        rating = int(data.get('rating'))
+    except (TypeError, ValueError):
+        return JsonResponse({'error': 'Rating must be between 1 and 5'}, status=400)
+    if rating < 1 or rating > 5:
+        return JsonResponse({'error': 'Rating must be between 1 and 5'}, status=400)
+
+    feedback, created = Feedback.objects.update_or_create(
+        ticket=ticket,
+        defaults={
+            'counter': counter,
+            'rating': rating,
+            'comment': (data.get('comment') or '').strip(),
+            'source': Feedback.Source.COUNTER,
+        },
+    )
+    return JsonResponse({
+        'ok': True,
+        'created': created,
+        'feedback_id': feedback.id,
     })
 
 

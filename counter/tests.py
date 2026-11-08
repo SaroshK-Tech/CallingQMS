@@ -43,3 +43,23 @@ class BroadcastTest(TransactionTestCase):
         await disp.disconnect()
         await single.disconnect()
         await dash.disconnect()
+
+    async def test_display_board_drops_served_ticket(self):
+        disp = WebsocketCommunicator(self.APP, '/ws/display/')
+        dash = WebsocketCommunicator(self.APP, f'/ws/dashboard/{self.c1.id}/')
+        connected_d, connected_dash = await disp.connect(), await dash.connect()
+        self.assertTrue(connected_d)
+        self.assertTrue(connected_dash)
+
+        await dash.send_json_to({'action': 'call_ticket', 'ticket_id': self.ticket.id})
+        called = await disp.receive_json_from(timeout=3)
+        self.assertEqual(called['type'], 'ticket_called')
+        self.assertEqual(called['ticket_number'], 'A001')
+
+        await dash.send_json_to({'action': 'done_ticket', 'ticket_id': self.ticket.id})
+        served = await disp.receive_json_from(timeout=3)
+        self.assertEqual(served['type'], 'ticket_served')
+        self.assertEqual(served['ticket_number'], 'A001')
+
+        await disp.disconnect()
+        await dash.disconnect()

@@ -14,6 +14,10 @@ staticfiles/
 # Runtime / temp
 error.txt
 *.log
+kiosk_config.txt
+
+# Secrets
+credentials.txt
 
 # OS
 .DS_Store

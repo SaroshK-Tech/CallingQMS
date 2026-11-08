@@ -9,6 +9,7 @@ urlpatterns = [
     path('', include('kiosk.urls')),
     path('counter/', include('counter.urls')),
     path('display/', include('display.urls')),
+    path('feedback/', include('core.urls')),
 ]
 
 if settings.DEBUG:

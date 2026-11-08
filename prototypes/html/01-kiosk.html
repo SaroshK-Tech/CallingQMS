@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EQMS Kiosk - Prototype</title>
+    <style>
+        :root {
+            --primary: #0d47a1;
+            --primary-light: #1976d2;
+            --primary-dark: #002171;
+            --accent: #ff6f00;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; width: 100%; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .kiosk-screen {
+            height: 100%;
+            background: linear-gradient(160deg, #0d47a1 0%, #1565c0 40%, #1976d2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 4vh 4vw;
+            position: relative;
+            overflow: hidden;
+        }
+        .kiosk-screen::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 50%;
+        }
+        .kiosk-screen::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 50%;
+        }
+        .kiosk-logo {
+            width: clamp(90px, 12vw, 210px);
+            margin-bottom: clamp(12px, 2.5vh, 34px);
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+            position: relative;
+            z-index: 1;
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: 700;
+        }
+        .kiosk-brand {
+            font-size: clamp(10px, 1.3vw, 17px);
+            font-weight: 500;
+            letter-spacing: clamp(2px, 0.3vw, 4px);
+            text-transform: uppercase;
+            opacity: 0.7;
+            margin-bottom: clamp(4px, 0.8vh, 8px);
+            position: relative;
+            z-index: 1;
+        }
+        .kiosk-title {
+            font-size: clamp(20px, 3vw, 48px);
+            font-weight: 700;
+            margin-bottom: clamp(4px, 0.8vh, 10px);
+            text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+        .kiosk-subtitle {
+            font-size: clamp(13px, 1.6vw, 22px);
+            opacity: 0.85;
+            margin-bottom: clamp(20px, 4.5vh, 48px);
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+        .kiosk-btn {
+            padding: clamp(12px, 2.4vh, 28px) clamp(26px, 4vw, 72px);
+            font-size: clamp(15px, 2vw, 26px);
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff8f00 0%, #ff6f00 100%);
+            color: white;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 32px rgba(255,111,0,0.4);
+            text-transform: uppercase;
+            letter-spacing: clamp(1px, 0.2vw, 3px);
+            position: relative;
+            z-index: 1;
+        }
+        .kiosk-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(255,111,0,0.5);
+        }
+        .kiosk-footer {
+            position: absolute;
+            bottom: clamp(8px, 2vh, 24px);
+            font-size: clamp(9px, 1vw, 13px);
+            opacity: 0.5;
+            z-index: 1;
+        }
+        .prototype-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: #69f0ae;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 100;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="prototype-badge">PROTOTYPE</div>
+    <div class="kiosk-screen">
+        <div class="kiosk-logo">EQMS</div>
+        <div class="kiosk-brand">AlgoriSync</div>
+        <h1 class="kiosk-title">Electronic Queue Management System</h1>
+        <p class="kiosk-subtitle">Press the button below to get your ticket</p>
+
+        <button class="kiosk-btn" onclick="showPopup()">GET TICKET</button>
+
+        <div class="kiosk-footer">Powered by AlgoriSync</div>
+    </div>
+
+    <!-- Ticket Popup -->
+    <div id="popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px); z-index:1000; align-items:center; justify-content:center;">
+        <div style="background:white; color:#1a1a2e; padding:48px; border-radius:24px; box-shadow:0 24px 80px rgba(0,0,0,0.4); text-align:center; max-width:430px; width:90%;">
+            <div style="width:84px; height:84px; background:linear-gradient(135deg, #4caf50, #2e7d32); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 24px; font-size:40px;">✓</div>
+            <div style="font-size:14px; font-weight:600; text-transform:uppercase; letter-spacing:2px; color:#64748b; margin-bottom:8px;">Your Ticket Number</div>
+            <div style="font-size:86px; font-weight:900; color:#0d47a1; letter-spacing:6px; line-height:1; margin-bottom:16px;">A-012</div>
+            <div style="font-size:20px; color:#2e7d32; font-weight:600; margin-bottom:16px;">Please Wait For Your Turn</div>
+            <div style="font-size:14px; color:#64748b; margin-bottom:32px;">Sep 16, 2026 - 14:32:05</div>
+            <button onclick="closePopup()" style="padding:14px 48px; font-size:16px; font-weight:600; background:#0d47a1; color:white; border:none; border-radius:8px; cursor:pointer;">OK</button>
+        </div>
+    </div>
+
+    <script>
+        function showPopup() {
+            document.getElementById('popup').style.display = 'flex';
+        }
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

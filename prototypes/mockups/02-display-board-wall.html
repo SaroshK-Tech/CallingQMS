@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, initial-scale=1.0">
+    <title>EQMS Mockup - Display Board in Waiting Area</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .scene {
+            width: 1920px;
+            height: 1080px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Wall */
+        .wall {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 700px;
+            background: linear-gradient(180deg, #f0f2f5 0%, #e4e7ec 100%);
+        }
+
+        /* Wall accent stripe */
+        .wall-accent {
+            position: absolute;
+            top: 680px;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(90deg, #0d47a1, #1976d2);
+        }
+
+        /* Floor */
+        .floor {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 380px;
+            background: linear-gradient(180deg, #c8c0b8 0%, #b8b0a8 100%);
+        }
+        .floor-tiles {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px),
+                linear-gradient(180deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+            background-size: 100px 100px;
+        }
+
+        /* === TV MONITOR ON WALL === */
+        .tv-container {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        /* Wall mount bracket */
+        .wall-mount {
+            width: 60px;
+            height: 30px;
+            background: #333;
+            margin: 0 auto;
+            border-radius: 0 0 4px 4px;
+            position: relative;
+        }
+        .wall-mount::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 8px;
+            background: #444;
+        }
+
+        /* TV Frame */
+        .tv-frame {
+            width: 960px;
+            height: 540px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 
+                0 20px 60px rgba(0,0,0,0.3),
+                0 0 0 1px rgba(255,255,255,0.05);
+            position: relative;
+        }
+        .tv-frame::before {
+            content: 'LG';
+            position: absolute;
+            bottom: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 8px;
+            color: #555;
+            letter-spacing: 2px;
+        }
+
+        /* Screen content - Display Board */
+        .tv-screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 4px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            background: linear-gradient(180deg, #0a0e27 0%, #111833 100%);
+            color: white;
+        }
+
+        /* Recent Calls Panel */
+        .recent-calls {
+            background: rgba(255,255,255,0.03);
+            padding: 20px 16px;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .recent-calls h2 {
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #ff6f00;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .call-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 8px;
+            border-left: 3px solid #ff6f00;
+            flex: 1 1 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .call-card:first-child {
+            background: rgba(255,111,0,0.1);
+            border-left-color: #69f0ae;
+        }
+        .call-card .ticket-num {
+            font-size: 28px;
+            font-weight: 900;
+            color: #69f0ae;
+            letter-spacing: 1px;
+        }
+        .call-card .counter-name {
+            font-size: 10px;
+            color: #ff6f00;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+        .call-card .time {
+            font-size: 9px;
+            color: rgba(255,255,255,0.4);
+            margin-top: 2px;
+        }
+
+        /* Advertising Area */
+        .ad-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .ad-placeholder {
+            width: 100%;
+            height: 100%;
+            border: 2px dashed rgba(255,255,255,0.1);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.15);
+        }
+        .ad-placeholder .ad-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .ad-placeholder .ad-sub {
+            font-size: 16px;
+        }
+
+        /* === WAITING AREA FURNITURE === */
+        
+        /* Row of chairs - left */
+        .chair-row-left {
+            position: absolute;
+            bottom: 380px;
+            left: 100px;
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Row of chairs - right */
+        .chair-row-right {
+            position: absolute;
+            bottom: 380px;
+            right: 100px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .chair {
+            width: 55px;
+            height: 70px;
+            position: relative;
+        }
+        .chair-back {
+            width: 55px;
+            height: 45px;
+            background: #1976d2;
+            border-radius: 4px 4px 0 0;
+            position: absolute;
+            bottom: 28px;
+        }
+        .chair-seat {
+            width: 55px;
+            height: 10px;
+            background: #1565c0;
+            border-radius: 3px;
+            position: absolute;
+            bottom: 18px;
+        }
+        .chair-leg {
+            position: absolute;
+            bottom: 0;
+            width: 3px;
+            height: 18px;
+            background: #666;
+            border-radius: 2px;
+        }
+        .chair-leg.l { left: 6px; }
+        .chair-leg.r { right: 6px; }
+
+        /* Coffee table */
+        .coffee-table {
+            position: absolute;
+            bottom: 380px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .table-top {
+            width: 120px;
+            height: 8px;
+            background: #8d6e63;
+            border-radius: 4px;
+        }
+        .table-legs {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px;
+        }
+        .table-leg {
+            width: 4px;
+            height: 30px;
+            background: #795548;
+            border-radius: 2px;
+        }
+
+        /* Ceiling light */
+        .ceiling-light {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 40px;
+            background: linear-gradient(180deg, #ddd, #eee);
+            border-radius: 0 0 100px 100px;
+        }
+        .light-glow {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 200px;
+            background: radial-gradient(ellipse, rgba(255,255,255,0.15) 0%, transparent 70%);
+        }
+
+        /* Annotation */
+        .annotation {
+            position: absolute;
+            background: white;
+            padding: 14px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            font-size: 13px;
+            color: #1a1a2e;
+            max-width: 240px;
+            line-height: 1.4;
+            z-index: 20;
+        }
+        .annotation strong {
+            color: #0d47a1;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .annotation-tv {
+            top: 120px;
+            right: 100px;
+        }
+        .annotation-tv::before {
+            content: '';
+            position: absolute;
+            left: -40px;
+            top: 20px;
+            width: 40px;
+            height: 2px;
+            background: #0d47a1;
+        }
+
+        /* Bottom label */
+        .label {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 20;
+        }
+        .label .dot {
+            width: 8px;
+            height: 8px;
+            background: #69f0ae;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="scene">
+        <!-- Environment -->
+        <div class="wall"></div>
+        <div class="wall-accent"></div>
+        <div class="floor">
+            <div class="floor-tiles"></div>
+        </div>
+
+        <!-- Ceiling light -->
+        <div class="ceiling-light"></div>
+        <div class="light-glow"></div>
+
+        <!-- TV Display Board -->
+        <div class="tv-container">
+            <div class="wall-mount"></div>
+            <div class="tv-frame">
+                <div class="tv-screen">
+                    <!-- Recent Calls -->
+                    <div class="recent-calls">
+                        <h2>Recent Calls</h2>
+                        <div class="call-card">
+                            <div class="ticket-num">A-012</div>
+                            <div class="counter-name">Counter 1 - General</div>
+                            <div class="time">14:32:05</div>
+                        </div>
+                        <div class="call-card">
+                            <div class="ticket-num">A-011</div>
+                            <div class="counter-name">Counter 2 - VIP</div>
+                            <div class="time">14:28:12</div>
+                        </div>
+                        <div class="call-card">
+                            <div class="ticket-num">B-005</div>
+                            <div class="counter-name">Counter 3 - X-Ray</div>
+                            <div class="time">14:24:48</div>
+                        </div>
+                        <div class="call-card">
+                            <div class="ticket-num">A-010</div>
+                            <div class="counter-name">Counter 1 - General</div>
+                            <div class="time">14:20:30</div>
+                        </div>
+                    </div>
+
+                    <!-- Advertising -->
+                    <div class="ad-area">
+                        <div class="ad-placeholder">
+                            <div class="ad-title">ADVERTISING</div>
+                            <div class="ad-sub">Images / Videos / Promotions</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Left chairs -->
+        <div class="chair-row-left">
+            <div class="chair"><div class="chair-back"></div><div class="chair-seat"></div><div class="chair-leg l"></div><div class="chair-leg r"></div></div>
+            <div class="chair"><div class="chair-back"></div><div class="chair-seat"></div><div class="chair-leg l"></div><div class="chair-leg r"></div></div>
+            <div class="chair"><div class="chair-back"></div><div class="chair-seat"></div><div class="chair-leg l"></div><div class="chair-leg r"></div></div>
+            <div class="chair"><div class="chair-back"></div><div class="chair-seat"></div><div class="chair-leg l"></div><div class="chair-leg r"></div></div>
+        </div>
+
+        <!-- Coffee table -->
+        <div class="coffee-table">
+            <div class="table-top"></div>
+            <div class="table-legs">
+                <div class="table-leg"></div>
+                <div class="table-leg"></div>
+            </div>
+        </div>
+
+        <!-- Right chairs -->
+        <div class="chair-row-right">
+            <div class="chair"><div class="chair-back"></div><div class="chair-seat"></div><div class="chair-leg l"></div><div class="chair-leg r"></div></div>
+            <div class="chair"><div class="chair-back"></div><div class="chair-seat"></div><div class="chair-leg l"></div><div class="chair-leg r"></div></div>
+            <div class="chair"><div class="chair-back"></div><div class="chair-seat"></div><div class="chair-leg l"></div><div class="chair-leg r"></div></div>
+            <div class="chair"><div class="chair-back"></div><div class="chair-seat"></div><div class="chair-leg l"></div><div class="chair-leg r"></div></div>
+        </div>
+
+        <!-- Annotation -->
+        <div class="annotation annotation-tv">
+            <strong>55" Display Board</strong>
+            Wall-mounted TV in the waiting area. Shows recent calls (left) and rotating advertisements (right). Updates in real-time.
+        </div>
+
+        <!-- Bottom label -->
+        <div class="label">
+            <div class="dot"></div>
+            EQMS-AlgoriSync &mdash; Display Board in Waiting Area
+        </div>
+    </div>
+</body>
+</html>

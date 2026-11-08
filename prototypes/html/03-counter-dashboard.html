@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EQMS Counter Dashboard - Prototype</title>
+    <style>
+        :root {
+            --primary: #0d47a1;
+            --primary-light: #1976d2;
+            --primary-dark: #002171;
+            --accent: #ff6f00;
+            --success: #2e7d32;
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --text: #1a1a2e;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --radius: 16px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; width: 100%; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+        }
+        .dashboard {
+            height: 100%;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: white;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            flex: 0 0 auto;
+        }
+        .dashboard-header h1 { font-size: 18px; font-weight: 600; }
+        .user-info { display: flex; align-items: center; gap: 16px; }
+        .counter-badge {
+            background: var(--accent);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .btn-logout {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .dashboard-body {
+            flex: 1 1 0;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            padding: 32px;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        .panel {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 28px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+        }
+        .panel h2 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .currently-serving {
+            text-align: center;
+            padding: 32px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+        .big-ticket {
+            font-size: 120px;
+            font-weight: 900;
+            color: var(--primary-dark);
+            letter-spacing: 6px;
+            line-height: 1;
+        }
+        .big-counter {
+            font-size: 20px;
+            color: var(--primary);
+            margin-top: 12px;
+            font-weight: 600;
+        }
+        .serving-label {
+            font-size: 16px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: stretch;
+        }
+        .action-btn {
+            flex: 1 1 0;
+            padding: 16px 32px;
+            font-size: 17px;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: white;
+        }
+        .btn-recall { background: linear-gradient(135deg, #ff9800, #e65100); }
+        .btn-next { background: linear-gradient(135deg, #1976d2, #0d47a1); }
+        .btn-complete { background: linear-gradient(135deg, #00c853, #00897b); }
+        .ticket-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+            flex: 1 1 0;
+            min-height: 0;
+            overflow-y: auto;
+            align-content: start;
+        }
+        .ticket-item {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 20px 16px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .ticket-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(46,125,50,0.2);
+            border-color: var(--success);
+        }
+        .ticket-item.selected {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #bbdefb 0%, #90caf9 100%);
+            box-shadow: 0 8px 20px rgba(13,71,161,0.3);
+        }
+        .ticket-item .ticket-num {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--primary-dark);
+            letter-spacing: 1px;
+        }
+        .ticket-item .ticket-service {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-top: 6px;
+            font-weight: 500;
+        }
+        .prototype-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: #69f0ae;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 100;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="prototype-badge">PROTOTYPE</div>
+    <div class="dashboard">
+        <div class="dashboard-header">
+            <h1>EQMS Counter Dashboard</h1>
+            <div class="user-info">
+                <span class="counter-badge">Counter 1</span>
+                <span>John Doe</span>
+                <button class="btn-logout">Logout</button>
+            </div>
+        </div>
+
+        <div class="dashboard-body">
+            <!-- Currently Serving -->
+            <div class="panel">
+                <div class="currently-serving">
+                    <div class="serving-label">Now Serving</div>
+                    <div class="big-ticket">A-012</div>
+                    <div class="big-counter">Counter 1 - General</div>
+                </div>
+                <div class="action-buttons">
+                    <button class="action-btn btn-recall">Recall</button>
+                    <button class="action-btn btn-next">Next</button>
+                    <button class="action-btn btn-complete">Done</button>
+                </div>
+            </div>
+
+            <!-- Waiting Tickets -->
+            <div class="panel" style="flex:1;">
+                <h2>Waiting Tickets</h2>
+                <div class="ticket-grid">
+                    <div class="ticket-item"><div class="ticket-num">A-001</div><div class="ticket-service">General</div></div>
+                    <div class="ticket-item"><div class="ticket-num">A-002</div><div class="ticket-service">General</div></div>
+                    <div class="ticket-item"><div class="ticket-num">A-003</div><div class="ticket-service">General</div></div>
+                    <div class="ticket-item"><div class="ticket-num">A-004</div><div class="ticket-service">General</div></div>
+                    <div class="ticket-item"><div class="ticket-num">A-005</div><div class="ticket-service">General</div></div>
+                    <div class="ticket-item"><div class="ticket-num">A-006</div><div class="ticket-service">General</div></div>
+                    <div class="ticket-item"><div class="ticket-num">A-007</div><div class="ticket-service">General</div></div>
+                    <div class="ticket-item"><div class="ticket-num">A-008</div><div class="ticket-service">General</div></div>
+                    <div class="ticket-item selected"><div class="ticket-num">A-009</div><div class="ticket-service">General</div></div>
+                    <div class="ticket-item"><div class="ticket-num">A-010</div><div class="ticket-service">General</div></div>
+                    <div class="ticket-item"><div class="ticket-num">A-011</div><div class="ticket-service">General</div></div>
+                    <div class="ticket-item"><div class="ticket-num">B-001</div><div class="ticket-service">VIP</div></div>
+                    <div class="ticket-item"><div class="ticket-num">B-002</div><div class="ticket-service">VIP</div></div>
+                    <div class="ticket-item"><div class="ticket-num">C-001</div><div class="ticket-service">X-Ray</div></div>
+                    <div class="ticket-item"><div class="ticket-num">C-002</div><div class="ticket-service">X-Ray</div></div>
+                    <div class="ticket-item"><div class="ticket-num">D-001</div><div class="ticket-service">Lab</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

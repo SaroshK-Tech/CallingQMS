@@ -1,5 +1,15 @@
 from django.contrib import admin
-from .models import Service, Counter, CounterService, CounterUser, Ticket, TicketCall, Advertisement
+
+from .models import (
+    Advertisement,
+    Counter,
+    CounterService,
+    CounterUser,
+    Feedback,
+    Service,
+    Ticket,
+    TicketCall,
+)
 
 
 class CounterServiceInline(admin.TabularInline):
@@ -8,10 +18,24 @@ class CounterServiceInline(admin.TabularInline):
     ordering = ['sequence']
 
 
+class ServiceCounterInline(admin.TabularInline):
+    """Assign an exceptional category to one or several counters."""
+
+    model = CounterService
+    fk_name = 'service'
+    extra = 1
+    ordering = ['sequence']
+    verbose_name = 'Assigned counter'
+    verbose_name_plural = 'Assigned counters'
+
+
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ['name', 'prefix', 'is_active']
-    list_filter = ['is_active']
+    list_display = ['name', 'prefix', 'is_usual', 'is_active']
+    list_filter = ['is_usual', 'is_active']
+    list_editable = ['is_usual', 'is_active']
+    search_fields = ['name', 'prefix']
+    inlines = [ServiceCounterInline]
 
 
 @admin.register(Counter)
@@ -34,6 +58,13 @@ class CounterAdmin(admin.ModelAdmin):
             )
 
 
+@admin.register(CounterService)
+class CounterServiceAdmin(admin.ModelAdmin):
+    list_display = ['counter', 'service', 'sequence']
+    list_filter = ['service', 'counter']
+    ordering = ['counter', 'sequence']
+
+
 @admin.register(CounterUser)
 class CounterUserAdmin(admin.ModelAdmin):
     list_display = ['user', 'counter']
@@ -42,15 +73,29 @@ class CounterUserAdmin(admin.ModelAdmin):
 
 @admin.register(Ticket)
 class TicketAdmin(admin.ModelAdmin):
-    list_display = ['ticket_number', 'service', 'status', 'current_counter', 'created_at']
+    list_display = [
+        'ticket_number', 'service', 'status', 'current_counter',
+        'no_show_count', 'created_at',
+    ]
     list_filter = ['status', 'service', 'current_counter']
     search_fields = ['ticket_number']
 
 
 @admin.register(TicketCall)
 class TicketCallAdmin(admin.ModelAdmin):
-    list_display = ['ticket', 'counter', 'called_at', 'recalled']
-    list_filter = ['counter', 'recalled']
+    list_display = [
+        'ticket', 'counter', 'called_at', 'served', 'served_at',
+        'duration_seconds', 'no_show', 'recall_count',
+    ]
+    list_filter = ['counter', 'served', 'no_show', 'recalled']
+    search_fields = ['ticket__ticket_number']
+
+
+@admin.register(Feedback)
+class FeedbackAdmin(admin.ModelAdmin):
+    list_display = ['ticket', 'counter', 'rating', 'source', 'created_at']
+    list_filter = ['rating', 'source', 'counter']
+    search_fields = ['ticket__ticket_number', 'comment']
 
 
 @admin.register(Advertisement)

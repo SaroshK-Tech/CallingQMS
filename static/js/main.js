@@ -84,29 +84,69 @@ class AudioAnnouncer {
 
     buildFileList(ticketNumber, counterName, lang) {
         const files = [];
-        const series = ticketNumber.charAt(0);
-        const digits = ticketNumber.slice(1);
-        
-        // Build audio file list
+        const match = /^([A-Za-z]*)(\d+)$/.exec(ticketNumber || '');
+        const series = match ? match[1] : (ticketNumber || '').slice(0, 1);
+        const digits = match ? match[2] : (ticketNumber || '').slice(1);
+
+        // The numeric part is spoken as a whole number (mirrors core/number_words.py).
+        const prefix = [`/static/audio/${lang}_ticket.mp3`];
+        if (series) prefix.push(`/static/audio/${lang}_${series}.mp3`);
+        for (const token of this.numberTokens(digits, lang)) {
+            prefix.push(`/static/audio/${lang}_n_${token}.mp3`);
+        }
+
+        files.push(...prefix);
+
         if (lang === 'en') {
-            files.push(`/static/audio/en_ticket.mp3`);
-            files.push(`/static/audio/en_${series}.mp3`);
-            for (const d of digits) {
-                files.push(`/static/audio/en_${d}.mp3`);
-            }
             files.push(`/static/audio/en_please_proceed_to.mp3`);
             files.push(`/static/audio/en_counter_${this.slug(counterName)}.mp3`);
         } else {
-            files.push(`/static/audio/ur_ticket.mp3`);
-            files.push(`/static/audio/ur_${series}.mp3`);
-            for (const d of digits) {
-                files.push(`/static/audio/ur_${d}.mp3`);
-            }
             files.push(`/static/audio/ur_please_proceed_to.mp3`);
             files.push(`/static/audio/ur_counter_${this.slug(counterName)}.mp3`);
+            files.push(`/static/audio/ur_go_to.mp3`);
         }
 
         return files;
+    }
+
+    numberTokens(number, lang) {
+        const n = parseInt(number, 10);
+        if (!Number.isFinite(n) || n <= 0) return ['0'];
+        return lang === 'ur' ? this.urduTokens(n) : this.englishTokens(n);
+    }
+
+    englishTokens(n) {
+        const tokens = [];
+        if (n >= 1000) {
+            tokens.push(...this.englishTokens(Math.floor(n / 1000)), '1000');
+            n %= 1000;
+            if (n && n < 100) tokens.push('and');
+        }
+        if (n >= 100) {
+            tokens.push(...this.englishTokens(Math.floor(n / 100)), '100');
+            n %= 100;
+            if (n) tokens.push('and');
+        }
+        if (n >= 20) {
+            tokens.push(String(Math.floor(n / 10) * 10));
+            n %= 10;
+        }
+        if (n) tokens.push(String(n));
+        return tokens;
+    }
+
+    urduTokens(n) {
+        const tokens = [];
+        if (n >= 1000) {
+            tokens.push(...this.urduTokens(Math.floor(n / 1000)), '1000');
+            n %= 1000;
+        }
+        if (n >= 100) {
+            tokens.push(String(Math.floor(n / 100)), '100');
+            n %= 100;
+        }
+        if (n) tokens.push(String(n));
+        return tokens;
     }
 
     slug(name) {

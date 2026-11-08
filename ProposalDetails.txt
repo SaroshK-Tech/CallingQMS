@@ -1,0 +1,241 @@
+================================================================================
+EQMS-AlgoriSync — PROPOSAL & QUOTATION SOURCE OF DETAILS
+================================================================================
+PURPOSE: This document is a complete specification for a professional quotation
+and project proposal. Use it to build the formal document with itemized
+pricing/scope. Each numbered module below corresponds to a billable line item.
+
+PROJECT NAME:  AlgoriSync Electronic Queue Management System (EQMS)
+PLATFORM:      Web-based, real-time, multi-counter queue system
+TARGET USERS:  Customer service centers, banks, hospitals, passport offices,
+               telecom branches, government service counters — any venue with
+               multi-stage service counters.
+
+================================================================================
+1. PROJECT SUMMARY (for proposal intro / executive summary)
+================================================================================
+AlgoriSync EQMS is a complete, self-hosted Electronic Queue Management System
+that digitizes the full customer journey:
+
+  Customer takes a ticket at the Kiosk  ->  waits  ->  is called to one or more
+  counters (in a service path)  ->  completes service  ->  leaves.
+
+Implementation is a real-time web application built on Django + Django Channels
+(WebSocket). No page refreshes anywhere — kiosk tickets, counter calls, display
+boards and audio announcements all update instantly across every screen on the
+network the moment an action happens.
+
+The system runs on a single Windows PC on the local network (server host). All
+client screens (kiosk, display boards, counter stations) are just browsers on
+any device — no client software installation required.
+
+Key differentiators over off-the-shelf systems:
+  - Multi-counter / multi-stage service PATH (ticket flows through counters in
+    a defined sequence, e.g. Check-in -> Documents -> Payment -> Token).
+  - Auto silent thermal receipt printing from the kiosk (no print dialog).
+  - Human-like multilingual audio calling (English + Urdu) with real neural
+    voices, parametrically generated so new counters/series never need manual
+    audio work.
+  - Commercial advertising on the display board (1/4 live calls : 3/4 ads).
+  - LAN-ready: works from any IP without reconfiguration.
+
+================================================================================
+2. SCOPE OF WORK — ITEMIZED MODULES (use 1 line-item each in the quotation)
+================================================================================
+ITEM 1  — Kiosk Ticket-Generation Screen
+  - Public brand screen with company logo (AlgoriSync logo supplied).
+  - Single big button (touch-friendly) -> generates next ticket.
+  - Multi-service option: user selects service type (A, B, VIP, etc.); ticket
+    numbers auto-increment per service per day (A001, A002 ... B001 ...).
+  - Silent auto-print of a thermal receipt with NO print dialog / confirmation
+    (uses default thermal printer).
+  - Receipt contents: AlgoriSync logo, "Electronic Queue Management System",
+    Ticket Number large & bold (e.g. A001), "Please Wait For Your Turn",
+    print date/time.
+  - Rationale handling: repeated prints, blank clicks ignored, per-day number
+    reset automatically.
+
+ITEM 2  — Full Display Board (1:3 Calls:Ads split)
+  - One screen, ratio 1:3: left 1 column = recent call cards, right 3 columns =
+    advertising (video / slide-show images).
+  - Live updates over WebSocket — no refresh; every new call appears instantly.
+  - Supports background/overlay ad rotation with configurable order.
+  - Shows: ticket number, counter name, service, time called, status styling.
+
+ITEM 3  — Single Counter Waiting-Area Display
+  - Per-counter wall display (e.g. "Counter 1" screen) showing the currently
+    called ticket number in large type for that counter's waiting area.
+  - Live update independent of the main board.
+
+ITEM 4  — Counter Dashboard (operators)
+  - Password-protected login per counter user (accounts).
+  - Live list of today's waiting tickets (all services for that counter).
+  - Actions per ticket: CALL, RECALL, DONE / complete, NEXT ticket,
+    PREVIOUS ticket (repeats last called ticket).
+  - Operator can pick ANY waiting ticket, not just the next one.
+  - Every call/recall triggers: screen updates on all boards + audio
+    announcement automatically.
+  - Same-day scope only: waiting lists and next/prev selection show ONLY today's
+    tickets, regardless of status.
+
+ITEM 5  — Travel / Service-Path Logic (counter sequencing)
+  - Ticket moves through counters in a configurable sequence per service
+    (CounterService ordering).
+  - "DONE" at one counter releases/queues the ticket for the next counter in
+    the path (or completes the journey at the final counter).
+
+ITEM 6  — Real-time Engine (WebSockets)
+  - Django Channels / Daphne ASGI server for sub-second pub/sub.
+  - Channel groups: dashboard_{counter}, display_board (all screens),
+    counter_display_{id}.
+  - All-connected-clients broadcast: ticket created, called, recalled, served.
+  - No refresh required anywhere.
+
+ITEM 7  — Audio Announcement System (English + Urdu)
+  - "Ticket # A 001, Please proceed to Counter 1" + Urdu equivalent.
+  - REAL neural TTS (not Windows voices): English via gTTS, Urdu via
+    edge-tts ur-PK-UzmaNeural (accents preserved).
+  - Parametric generation: audio files generated automatically when counters or
+    service prefixes (A/B/VIP) change — no manual voice recording/editing ever.
+  - Server-side playback (fires on call) + browser-based playback on boards.
+
+ITEM 8  — Administration (Django Admin)
+  - Manage Services (name + prefix + active), Counters, CounterService
+    sequencing, CounterUser assignments, Tickets, TicketCall audit log
+    (full call history incl. recalls/serves), Advertisements (image/video).
+  - Auto-regenerates counter audio on save when counter name changes.
+  - Full audit trail of every call/recall/completion.
+
+ITEM 9  — Backend & Architecture
+  - Framework: Django 6.1 + Channels 4.3 (ASGI), Daphne server.
+  - Database: SQLite for single-host deployment (swappable to PostgreSQL/MySQL).
+  - WhiteNoise serves static files under Daphne.
+  - Environment-variable configuration (secret key, debug, allowed hosts,
+    CSRF trust, DB path) for safe production deployment.
+  - Clean app structure: core (models/admin), accounts, kiosk, counter, display.
+
+ITEM 10 — Deployment & Delivery
+  - Ready-made launchers (.bat) for server host and client machines.
+    * start_server_on_host.bat — starts server, auto-detects LAN IP, prints URLs.
+    * kiosk.bat / deploy_kiosk.bat — client kiosk PCs; remembers server IP
+      (kiosk_config.txt), opens kiosk in fullscreen mode (Chrome/Edge).
+    * kiosk_display.bat — client display screen launcher.
+  - Runs on ANY IP on the LAN without reconfiguration (relative URLs +
+    bind 0.0.0.0).
+  - Documentation, default credentials, and setup guide included.
+
+ITEM 11 — Recurring Support / Maintenance (optional add-on)
+  - Server & software updates, TTS regeneration, data backups, admin of new
+    counters/services/ads, phone/remote support (term to be agreed).
+
+================================================================================
+3. FUNCTIONAL REQUIREMENTS SUMMARY (put in proposal as "Features Matrix"
+================================================================================
+Feature                              Kiosk   Display  Counter   Admin   Audio
+  Ticket generation w/ auto receipt      X
+  Per-service daily ticket sequence      X        X        X       X
+  Silent thermal receipt print           X
+  Live call cards (recent)                        X
+  Advertising rotation (img/video)               X
+  Single counter "current ticket"                X (per counter screen)
+  Operator login & dashboard                              X
+  Call / recall / done / next / prev                   X
+  Pick any waiting ticket                              X
+  Same-day only filtering                              X        X
+  Multi-stage service path                            X         X
+  Real-time broadcast (no refresh)        X        X        X
+  EN + UR neural voice calling                     X         X
+  Full call audit log (TicketCall)                                     X
+  Ad / service / counter management                                      X
+
+================================================================================
+4. TECHNICAL SPECIFICATIONS (for proposal "Technical Approach")
+================================================================================
+Backend:     Django 6.1.1, Channels 4.3.2, Daphne 4.2.3 (ASGI), asgiref
+Database:    SQLite (dev/single-host) — swappable PostgreSQL/MySQL
+Frontend:    Vanilla HTML/CSS/JS + WebSocket clients (no heavy framework =
+             lightweight, fast on cheap kiosk PCs)
+Static:      WhiteNoise (no Nginx needed on LAN)
+Audio:       gTTS (English), edge-tts ur-PK-UzmaNeural (Urdu), ffmpeg trimming,
+             admin-triggered auto-regeneration
+WebSocket:   Groups: dashboard_{counter_id}, display_board,
+             counter_display_{counter_id}
+Models:      Service, Counter, CounterService, CounterUser, Ticket
+             (WAITING/CALLED/IN_PROGRESS/COMPLETED/CANCELLED), TicketCall,
+             Advertisement
+Deployment:  Single Windows host, bind 0.0.0.0, port 8000 (configurable), no
+             client install — browsers only
+Security:    Auth via Django auth, CSRF, env-var secrets, ALLOWED_HOSTS control
+
+================================================================================
+5. HARDWARE / ENVIRONMENT REQUIREMENTS (include in proposal "Requirements")
+================================================================================
+Server host PC:  Windows 10/11, 4GB+ RAM, any modern CPU, HDD/SSD, network
+                 (Ethernet/Wi-Fi, static IP recommended), Python 3.12+,
+                 thermal receipt printer attached to the kiosk PC.
+Kiosk PC:        Touchscreen PC/tablet running Chrome/Edge fullscreen.
+Counter PCs:     One per counter station, any PC/browser + logged-in user.
+Display screens: One TV/monitor per display area (HDMI/mini-PC or browser
+                 device); main board + one per counter waiting area.
+LAN:             Single flat LAN (same subnet recommended); all devices reach
+                 the host at http://<host-ip>:8000.
+
+SUPPLIED PRE-REQUISITES BY CLIENT (exclusions):
+  - Thermal receipt printer + drivers on the kiosk PC.
+  - Display TVs / kiosk hardware / PCs (unless requested as hardware items).
+  - Advertising assets (images/videos) for the display board.
+  - Access to the LAN and permission to install Python on the host PC.
+
+================================================================================
+6. DELIVERABLES (proposal "Deliverables & Acceptance")
+================================================================================
+  - Complete source code repository (clean, documented, git).
+  - Installation & operations guide (start_server_on_host + client launchers,
+    defaults, env-var reference, admin how-to).
+  - Pre-generated EN + UR audio set + regeneration script/tool.
+  - Data of default admin + counter users configurable at deployment.
+  - One-site deployment/commissioning & operator training session.
+  - 30/60/90-day defect-warranty (scope to agree).
+
+================================================================================
+7. BOQ TEMPLATE — PRICE TABLE (line items for quotation, fill rates)
+================================================================================
+ # | Module                                 | Qty | Unit | Rate | Amount
+ 1 | Kiosk ticket screen + silent receipt     |  1  | lot  |      |
+ 2 | Display board (1:3 calls:ads)            |  1  | lot  |      |
+ 3 | Per-counter waiting display              |  N  | each |      |
+ 4 | Counter dashboard (operator console)     |  1  | lot  |      |
+ 5 | Service-path / sequencing engine         |  1  | lot  |      |
+ 6 | Realtime WebSocket engine                |  1  | lot  |      |
+ 7 | EN+UR neural audio calling system        |  1  | lot  |      |
+ 8 | Admin panel & audit reports              |  1  | lot  |      |
+ 9 | Deployment launchers + documentation     |  1  | lot  |      |
+10 | Training + commissioning                 |  V  | days |      |
+11 | Optional: hardware bundle (kiosk PC, TV, | opt | each |
+   |   printer, mini-PC) — quote on request   |     |      |      |
+12 | Optional: annual support & maintenance   |  1  | year |      |
+   |---------------------------------------------------------------|
+   | SUBTOTAL                                                    |
+   | Taxes (per applicable law)                                  |
+   | GRAND TOTAL                                                 |
+
+NOTE: Rates blank by design — the quoting AI/analyst fills them after
+consultation with the client about LAN size, number of counters/display TVs.
+
+================================================================================
+8. ASSUMPTIONS, EXCLUSIONS & VALIDITY
+================================================================================
+ASSUMPTIONS:
+  - Client uses a Windows PC as the server host inside their LAN.
+  - Client PCs have modern browsers (Chrome/Edge) and internet access
+    ONLY on the host machine briefly during initial audio generation
+    (TTS services are cloud APIs); runtime is fully offline/LAN.
+  - Number of counters/services/ads is configurable by admin (no per-unit
+    license fee).
+VALIDITY: Quotation valid for 30 days from date of issue.
+PAYMENT:  Recommend 40% advance, 50% on acceptance, 10% on training/handover.
+TIMELINE: 1–2 weeks for base build (per config), allow tuning time for audio.
+
+================================================================================
+END OF PROPOSAL DETAILS
+================================================================================

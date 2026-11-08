@@ -1,102 +1,226 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}EQMS Display Board{% endblock %}
+{% block title %}Taj Medical Centre | Now Serving{% endblock %}
 
 {% block content %}
 <div class="display-board fit-screen">
-    <!-- Recent Calls Panel (1 column) -->
-    <div class="recent-calls">
-        <h2>Recent Calls</h2>
-        <div id="recentCalls">
-            {% for call in recent_calls %}
-            <div class="call-card">
-                <div class="ticket-num">{{ call.ticket.ticket_number }}</div>
-                <div class="counter-name">{{ call.counter.display_name|default:call.counter.name }}</div>
-                <div class="time">{{ call.called_at|time:"H:i:s" }}</div>
-            </div>
-            {% endfor %}
-            {% if not recent_calls %}
-            <div style="text-align: center; color: rgba(255,255,255,0.4); padding: 60px 20px;">
-                Waiting for calls...
-            </div>
-            {% endif %}
-        </div>
-    </div>
 
-    <!-- Advertising Area (3 columns) -->
-    <div class="advertising-area">
-        {% if ads %}
-        <div id="adSlider">
-            {% for ad in ads %}
-            <div class="ad-slide {% if forloop.first %}active{% endif %}" data-index="{{ forloop.counter0 }}">
-                {% if ad.video %}
-                <video autoplay muted loop>
-                    <source src="{{ ad.video.url }}" type="video/mp4">
-                </video>
-                {% elif ad.image %}
-                <img src="{{ ad.image.url }}" alt="{{ ad.title }}">
-                {% endif %}
+    <!-- Header: client logo + live date/time -->
+    <header class="db-header">
+        <img class="db-logo" src="{% static 'images/logo.png' %}" alt="Taj Medical Centre">
+        <div class="db-clock">
+            <div class="db-date" id="dbDate">{{ today|date:"D, d M Y" }}</div>
+            <div class="db-time" id="dbTime">{% now "H:i" %}</div>
+        </div>
+    </header>
+
+    <!-- Main: cash counter card + three fixed station rows -->
+    <main class="db-main">
+        <section class="db-feature{% if not state.cash.active %} is-empty{% endif %}" id="dbFeature" aria-live="polite">
+            <div class="db-feature-ticket" id="dbFeatureTicket">{{ state.cash.ticket_number }}</div>
+            <div class="db-feature-label" id="dbFeatureLabel">{{ state.cash.label }}</div>
+        </section>
+
+        <section class="db-list">
+            <h2 class="db-list-title">Now Serving</h2>
+            <div class="db-list-rows" id="dbList">
+                {% for row in state.stations %}
+                <div class="db-call{% if not row.active %} is-idle{% endif %}" data-key="{{ row.key }}">
+                    <span class="db-call-ticket">{{ row.ticket_number }}</span>
+                    <span class="db-call-name">{{ row.name }}</span>
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+        </section>
+    </main>
+
+    <!-- Footer: tagline line, then AlgoriSync branding on the bottom line -->
+    <footer class="db-footer">
+        <div class="db-footer-tagline">
+            <span class="db-footer-line"></span>
+            <span class="db-footer-text">Your health is our priority</span>
+            <span class="db-footer-line"></span>
         </div>
-        {% else %}
-        <div style="text-align: center; color: rgba(255,255,255,0.3);">
-            <img src="{% static 'images/logo02.png' %}" alt="AlgoriSync" style="max-width: 400px; opacity: 0.3;">
-            <p style="margin-top: 20px; font-size: 20px;">No advertisements</p>
+        <div class="db-powered">
+            <span class="db-powered-label">Powered by</span>
+            <img class="db-powered-logo" src="{% static 'images/logo02.png' %}" alt="AlgoriSync">
         </div>
-        {% endif %}
-    </div>
+    </footer>
 </div>
 
+{{ state|json_script:"db-state" }}
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    const ws = new EQMSWebSocket('display', handleMessage);
-    let callsContainer = document.getElementById('recentCalls');
+(function () {
+    const feature = document.getElementById('dbFeature');
+    const featureTicket = document.getElementById('dbFeatureTicket');
+    const list = document.getElementById('dbList');
+    const dateEl = document.getElementById('dbDate');
+    const timeEl = document.getElementById('dbTime');
 
+    // Server-rendered state seeds the page; WebSocket messages keep it live.
+    let state = JSON.parse(document.getElementById('db-state').textContent || '{}');
+    let lastCashTicket = state.cash && state.cash.ticket_id;
+
+    function rows() {
+        const byKey = {};
+        list.querySelectorAll('.db-call[data-key]').forEach(function (el) {
+            byKey[el.getAttribute('data-key')] = el;
+        });
+        return byKey;
+    }
+
+    function setSlotText(el, value) {
+        const ticketEl = el.querySelector('.db-call-ticket');
+        if (ticketEl && ticketEl.textContent !== value) {
+            ticketEl.textContent = value;
+        }
+    }
+
+    function renderCash(popTicket) {
+        const cash = state.cash;
+        if (!cash) return;
+
+        const active = !!cash.ticket_number && cash.ticket_number !== '---';
+        feature.classList.toggle('is-empty', !active);
+        featureTicket.textContent = active ? cash.ticket_number : '---';
+
+        const changed = popTicket != null && String(popTicket) !== String(lastCashTicket);
+        lastCashTicket = cash.ticket_id;
+
+        featureTicket.classList.remove('pop');
+        if (changed) {
+            // Restart the animation on the next frame.
+            void featureTicket.offsetWidth;
+            featureTicket.classList.add('pop');
+        }
+    }
+
+    function renderRows() {
+        const els = rows();
+        (state.stations || []).forEach(function (row) {
+            const el = els[row.key];
+            if (!el) return;
+            el.classList.toggle('is-idle', !row.active);
+            setSlotText(el, row.ticket_number || '---');
+        });
+    }
+
+    function render(popTicket) {
+        renderCash(popTicket);
+        renderRows();
+    }
+
+    // Which slot belongs to the counter that sent a WebSocket message?
+    function targetFor(counterId) {
+        if (counterId == null) return null;
+        const id = String(counterId);
+
+        if (state.cash && state.cash.counter_id != null && String(state.cash.counter_id) === id) {
+            return {type: 'cash'};
+        }
+        for (const row of (state.stations || [])) {
+            if (row.counter_id != null && String(row.counter_id) === id) {
+                return {type: 'station', row: row};
+            }
+        }
+        return null;
+    }
+
+    function clearCash() {
+        state.cash.ticket_id = null;
+        state.cash.ticket_number = '---';
+        state.cash.active = false;
+    }
+
+    function clearRow(row) {
+        row.ticket_id = null;
+        row.ticket_number = '---';
+        row.active = false;
+    }
+
+    // Terminating a client at the main counter cancels the ticket everywhere,
+    // so it has to leave every slot at once.
+    function dropTicketEverywhere(ticketId) {
+        const id = String(ticketId);
+        if (state.cash && String(state.cash.ticket_id) === id) {
+            clearCash();
+        }
+        (state.stations || []).forEach(function (row) {
+            if (String(row.ticket_id) === id) {
+                clearRow(row);
+            }
+        });
+    }
+
+    function callTarget(target, data) {
+        if (target.type === 'cash') {
+            state.cash.ticket_id = data.ticket_id;
+            state.cash.ticket_number = data.ticket_number;
+            state.cash.active = true;
+            state.cash.called_at = data.called_at || '';
+        } else {
+            target.row.ticket_id = data.ticket_id;
+            target.row.ticket_number = data.ticket_number;
+            target.row.active = true;
+            target.row.called_at = data.called_at || '';
+        }
+    }
+
+    // A ticket can be at several stations at once (cash, blood, x-ray, …), so
+    // board slots are updated independently: one counter's call or Done never
+    // clears another counter's slot.
     function handleMessage(data) {
         if (data.type === 'ticket_called' || data.type === 'ticket_recalled') {
-            addCallCard(data);
+            const target = targetFor(data.counter_id);
+            if (!target) return;
+            callTarget(target, data);
+            render(target.type === 'cash' ? data.ticket_id : null);
+        } else if (data.type === 'ticket_served' || data.type === 'ticket_no_show') {
+            const target = targetFor(data.counter_id);
+            if (!target) return;
+            if (target.type === 'cash') {
+                clearCash();
+            } else {
+                clearRow(target.row);
+            }
+            render(null);
         }
     }
 
-    function addCallCard(data) {
-        // Remove empty state message
-        const emptyMsg = callsContainer.querySelector('div[style]');
-        if (emptyMsg && emptyMsg.textContent.includes('Waiting for calls')) {
-            emptyMsg.remove();
-        }
-
-        const card = document.createElement('div');
-        card.className = 'call-card';
-        card.innerHTML = `
-            <div class="ticket-num">${data.ticket_number}</div>
-            <div class="counter-name">${data.counter_name}</div>
-            <div class="time">${data.called_at}</div>
-        `;
-        
-        callsContainer.insertBefore(card, callsContainer.firstChild);
-        
-        // Keep only last 4 calls
-        while (callsContainer.children.length > 4) {
-            callsContainer.removeChild(callsContainer.lastChild);
-        }
+    // Re-sync in case a WebSocket message was missed while reconnecting.
+    function syncFromServer() {
+        fetch('{% url "api_now_serving" %}', { headers: { 'Accept': 'application/json' } })
+            .then(function (response) { return response.ok ? response.json() : null; })
+            .then(function (payload) {
+                if (payload && payload.cash && Array.isArray(payload.stations)) {
+                    state = payload;
+                    render(null);
+                }
+            })
+            .catch(function () { /* keep current state */ });
     }
 
-    // Ad slideshow
-    {% if ads %}
-    const slides = document.querySelectorAll('.ad-slide');
-    let currentSlide = 0;
-    
-    function nextSlide() {
-        slides[currentSlide].classList.remove('active');
-        currentSlide = (currentSlide + 1) % slides.length;
-        slides[currentSlide].classList.add('active');
+    // Live clock (Tue, 26 Oct 2026 / 10:24 AM)
+    function updateClock() {
+        const now = new Date();
+        dateEl.textContent = now.toLocaleDateString('en-GB', {
+            weekday: 'short', day: '2-digit', month: 'short', year: 'numeric'
+        });
+        timeEl.textContent = now.toLocaleTimeString('en-US', {
+            hour: 'numeric', minute: '2-digit'
+        });
     }
-    
-    setInterval(nextSlide, 10000);
-    {% endif %}
+
+    updateClock();
+    setInterval(updateClock, 1000);
+    setInterval(syncFromServer, 30000);
+    render(null);
+
+    new EQMSWebSocket('display', handleMessage);
+})();
 </script>
 {% endblock %}
