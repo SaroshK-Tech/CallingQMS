@@ -60,12 +60,12 @@ glitch or a server restart.
 | HUB12 signal | Typical IDC pin | `config.h` macro | Default ESP32 GPIO |
 |---|---|---|---|
 | `OE` / `EN` (output enable, active low) | 1 | `PIN_OE` | **4** |
-| `A` (row address) | 2 | `PIN_A` | **25** |
-| `B` (row address) | 3 | `PIN_B` | **26** |
+| `A` (row address) | 2 | `PIN_A` | **16** |
+| `B` (row address) | 3 | `PIN_B` | **14** |
 | `GND` | 4, 6, 8, 10–16 | — | **GND** |
 | `R` / `DATA` (serial data) | 5 | `PIN_DATA` | **23** |
 | `CLK` (shift clock) | 7 | `PIN_SCK` | **18** |
-| `LAT` / `STB` (latch) | 9 | `PIN_LATCH` | **27** |
+| `LAT` / `STB` (latch) | 9 | `PIN_LATCH` | **19** |
 | `C`, `D` | — | `PIN_C`, `PIN_D` | not used (`-1`) |
 
 HUB12 is not as strictly standardized as HUB75: a few modules shuffle the

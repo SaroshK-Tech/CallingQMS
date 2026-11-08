@@ -22,11 +22,18 @@
 //   OE      : output enable (brightness PWM)
 //   DATA/R1 : serial data
 // Pin C and D are not used by HUB12 panels.
-#define PIN_A 25
-#define PIN_B 26
+//
+// These match the reference project at E:\agentProjects\display counter
+// (firmware/display_counter/display_counter.ino):
+//   A=16, B=14, OE=4, CLK=18, LAT=19, DATA=23
+//
+// NOTE: On WROVER/PSRAM boards GPIO16/17 are used by PSRAM. If you are using
+// such a board, move PIN_A/PIN_B to free pins (e.g. 25/26) here.
+#define PIN_A 16
+#define PIN_B 14
 #define PIN_C -1
 #define PIN_D -1
-#define PIN_LATCH 27
+#define PIN_LATCH 19
 #define PIN_SCK 18
 #define PIN_OE 4
 #define PIN_DATA 23

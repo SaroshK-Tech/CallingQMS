@@ -13,11 +13,11 @@ These are the values currently in `config.h` (the compiled defaults):
 | ESP32 GPIO | `config.h` macro | HUB12 signal | HUB12 IDC pin |
 |-----------:|------------------|--------------|--------------:|
 | GPIO4  | `PIN_OE`    | `OE` / `EN` (active low) | 1 |
-| GPIO25 | `PIN_A`     | `A` (row address)        | 2 |
-| GPIO26 | `PIN_B`     | `B` (row address)        | 3 |
+| GPIO16 | `PIN_A`     | `A` (row address)        | 2 |
+| GPIO14 | `PIN_B`     | `B` (row address)        | 3 |
 | GPIO23 | `PIN_DATA`  | `DATA` / `R`             | 5 |
 | GPIO18 | `PIN_SCK`   | `CLK`                    | 7 |
-| GPIO27 | `PIN_LATCH` | `LAT` / `STB`            | 9 |
+| GPIO19 | `PIN_LATCH` | `LAT` / `STB`            | 9 |
 | —      | `PIN_C` / `PIN_D` = `-1` | `C`, `D` (not used) | — |
 | GND    | —           | `GND`                    | 4, 6, 8, 10–16 |
 
@@ -96,10 +96,10 @@ Use one channel per signal. Suggested channel assignment for a 74HCT245:
 | ESP32 GPIO | 74HCT245 A pin | 74HCT245 B pin | HUB12 signal |
 |-----------:|---------------:|---------------:|--------------|
 | GPIO4  | A1 (pin 2) | B1 (pin 18) | `OE` |
-| GPIO25 | A2 (pin 3) | B2 (pin 17) | `A` |
-| GPIO26 | A3 (pin 4) | B3 (pin 16) | `B` |
+| GPIO16 | A2 (pin 3) | B2 (pin 17) | `A` |
+| GPIO14 | A3 (pin 4) | B3 (pin 16) | `B` |
 | GPIO18 | A4 (pin 5) | B4 (pin 15) | `CLK` |
-| GPIO27 | A5 (pin 6) | B5 (pin 14) | `LAT` / `STB` |
+| GPIO19 | A5 (pin 6) | B5 (pin 14) | `LAT` / `STB` |
 | GPIO23 | A6 (pin 7) | B6 (pin 13) | `DATA` / `R` |
 
 74HCT245 power/control pins: VCC = pin 20 (5 V), GND = pin 10, `DIR` = pin 1
