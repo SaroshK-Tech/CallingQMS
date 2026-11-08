@@ -245,40 +245,31 @@ void drawScaledText(const String &text, uint8_t scale) {
 }
 
 void renderFrame(const String &line, uint8_t scale) {
-  if (scratch == nullptr) return;
-
+  // Draw directly to the panel buffer using the library's built-in text
+  // renderer. The custom scratch-bitmap scaler (drawScaledText) caused
+  // partial-row display on some HUB12 panel variants; drawing directly is
+  // simpler and more reliable.
   dmd.clear();
-  if (flashVisible() && line.length()) {
-    drawScaledText(line, scale);
-  }
-  dmd.swapBuffers();
+  dmd.setFont(Font3x5);
+  dmd.setTextColor(FansElectronics_Bitmap::White);
+
+  int textW = dmd.textWidth(line);
+  int textH = dmd.textHeight();
+  int startX = (dmd.width() - textW) / 2;
+  int startY = (dmd.height() - textH) / 2;
+
+  if (startX < 0) startX = 0;
+  if (startY < 0) startY = 0;
+
+  dmd.drawText(startX, startY, line);
 }
 
 void updateDisplay() {
-  const uint32_t now = millis();
   const String line = lineToShow();
-  const uint8_t scale = effectiveScale();
 
-  if (line != lastLine || scale != lastScale) {
+  if (line != lastLine) {
     lastLine = line;
-    lastScale = scale;
-    scrollOffset = 0;
-    lastScrollAt = now;
-    renderFrame(line, scale);
-  } else if (textNeedsScroll(line, scale) &&
-             (uint32_t)(now - lastScrollAt) >= SCROLL_STEP_MS) {
-    lastScrollAt = now;
-    ++scrollOffset;
-    if (scrollOffset > (uint32_t)(scratch->textWidth(line) * scale)) {
-      scrollOffset = 0;
-    }
-    renderFrame(line, scale);
-  }
-
-  const bool visible = flashVisible();
-  if (visible != lastFlashVisible) {
-    lastFlashVisible = visible;
-    renderFrame(line, scale);
+    renderFrame(line, effectiveScale());
   }
 
   dmd.update();
@@ -674,7 +665,6 @@ void setup() {
                 cfg.brightness, cfg.fontScale);
 
   dmd.begin(PANEL_HUB12, PANEL_MODULES_WIDE, PANEL_MODULES_HIGH, panelPins());
-  dmd.setDoubleBuffer(true);
   applyBrightness();
 
   scratch = new FansElectronics_Bitmap(384, 8);

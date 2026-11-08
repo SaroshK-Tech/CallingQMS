@@ -57,7 +57,7 @@
 #define DEFAULT_SERVER_PORT 8000
 #define DEFAULT_COUNTER_ID 1
 #define DEFAULT_BRIGHTNESS 70      // percent, 0..100
-#define DEFAULT_FONT_SCALE 2       // 1..4 (2 = readable on a single 32x16 panel)
+#define DEFAULT_FONT_SCALE 1       // 1..4 (1 = safe on all panels, 2 = readable on a single 32x16 panel)
 
 // Networking timings (milliseconds).
 #define WIFI_CONNECT_TIMEOUT_MS 20000
