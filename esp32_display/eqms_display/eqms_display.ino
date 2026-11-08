@@ -327,7 +327,7 @@ void onWebSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
 
     case WStype_DISCONNECTED:
       wsConnected = false;
-      Serial.println(F("[EQMS] WebSocket disconnected"));
+      Serial.println(F("[EQMS] WebSocket disconnected - will retry"));
       break;
 
     case WStype_TEXT:
@@ -350,7 +350,7 @@ void startWebSocket() {
   ws.begin(cfg.serverHost.c_str(), cfg.serverPort, path.c_str());
   ws.onEvent(onWebSocketEvent);
   ws.setReconnectInterval(WS_RECONNECT_INTERVAL_MS);
-  ws.enableHeartbeat(15000, 3000, 2);
+  ws.enableHeartbeat(30000, 5000, 3);
   wsStarted = true;
 }
 
@@ -680,8 +680,13 @@ void loop() {
         updateDisplay();
         if (fetchSnapshot()) {
           snapshotFailures = 0;
-        } else if (++snapshotFailures >= 2 && currentTicket.length() == 0) {
-          showTransient(F("NO SERVER"), 2500);
+        } else {
+          Serial.print(F("[EQMS] Snapshot poll failed (failures="));
+          Serial.print(++snapshotFailures);
+          Serial.println(F(")"));
+          if (snapshotFailures >= 2 && currentTicket.length() == 0) {
+            showTransient(F("NO SERVER"), 2500);
+          }
         }
         updateDisplay();
       }
