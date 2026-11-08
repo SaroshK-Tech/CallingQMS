@@ -710,29 +710,43 @@ void setup() {
 void loop() {
   const uint32_t now = millis();
 
+  // Refresh the panel first to catch up on any timer ticks missed while the
+  // previous loop iteration was blocked on network I/O. The DMD32 library's
+  // 1/4-scan refresh relies on update() being called every ~1 ms; blocking
+  // calls (HTTP snapshot, WebSocket, server.handleClient) can stall for much
+  // longer, leaving the panel stuck on one scan phase (partial rows).
+  updateDisplay();
+
   if (mode == MODE_CONFIG) {
     dnsServer.processNextRequest();
     server.handleClient();
   } else {
     checkConfigButton();
+
+    updateDisplay();
     server.handleClient();
+    updateDisplay();
 
     if (WiFi.status() == WL_CONNECTED) {
       if (!wsStarted) {
         startWebSocket();
       }
       ws.loop();
+      updateDisplay();
 
       const uint32_t interval = wsConnected ? SNAPSHOT_INTERVAL_WS_MS
                                             : SNAPSHOT_INTERVAL_NO_WS_MS;
       if (needSnapshot || (uint32_t)(now - lastSnapshotAt) >= interval) {
         needSnapshot = false;
         lastSnapshotAt = now;
+
+        updateDisplay();
         if (fetchSnapshot()) {
           snapshotFailures = 0;
         } else if (++snapshotFailures >= 2 && currentTicket.length() == 0) {
           showTransient(F("NO SERVER"), 2500);
         }
+        updateDisplay();
       }
     } else if ((uint32_t)(now - lastWifiRetryAt) >= 10000) {
       lastWifiRetryAt = now;
