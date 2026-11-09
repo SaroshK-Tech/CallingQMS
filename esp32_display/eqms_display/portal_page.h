@@ -105,7 +105,7 @@ const char PORTAL_HTML[] PROGMEM = R"HTML(<!DOCTYPE html>
             <input type="range" id="scale" name="scale" min="1" max="%%MAXSCALE%%" step="1" value="%%FONTSCALE%%">
             <output id="scaleOut">2x</output>
           </div>
-          <div class="hint">Larger text scrolls when it does not fit the panel.</div>
+          <div class="hint">2x fills the panel height. Text is shrunk automatically if a ticket is too wide.</div>
         </div>
       </div>
     </div>

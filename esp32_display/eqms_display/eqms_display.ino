@@ -29,6 +29,7 @@
 #include <ArduinoJson.h>
 #include <FansElectronics_DMD32.h>
 #include <fonts/Font5x7b.h>
+#include <fonts/Font3x5.h>
 
 #include "config.h"
 #include "portal_page.h"
@@ -83,6 +84,25 @@ uint32_t transientUntil = 0;
 
 uint32_t flashStart = 0;
 bool lastFlashVisible = true;
+
+// The DMD library must have update() called every ~1 ms to advance the 1/4-scan
+// refresh. Calling it only from loop() means any blocking network call
+// (WebSocket reconnect, HTTP snapshot, Serial) freezes the scan, which shows up
+// as flicker/waveform dimming or the panel going dark for a moment.
+// This task owns dmd.update() so the panel keeps scanning independently of the
+// main loop. It is pinned to the same core as loop(), so they time-slice and a
+// blocked loop still lets the refresh run.
+TaskHandle_t displayTaskHandle = NULL;
+
+void displayRefreshTask(void *param) {
+  (void)param;
+  for (;;) {
+    dmd.update();
+    // 1 FreeRTOS tick = 1 ms: matches the library's refresh interval and also
+    // yields to the idle/watchdog task.
+    vTaskDelay(1);
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Small helpers
@@ -139,7 +159,15 @@ void loadSettings() {
   cfg.serverPort = prefs.getUShort("port", DEFAULT_SERVER_PORT);
   cfg.counterId = prefs.getUShort("counter", DEFAULT_COUNTER_ID);
   cfg.brightness = prefs.getUChar("bright", DEFAULT_BRIGHTNESS);
-  cfg.fontScale = prefs.getUChar("scale", DEFAULT_FONT_SCALE);
+  // "scale2" is the current key. Older firmware stored "scale" but never
+  // applied it, so honour the legacy value only if it was explicitly raised;
+  // otherwise use the new, larger default.
+  if (prefs.isKey("scale2")) {
+    cfg.fontScale = prefs.getUChar("scale2", DEFAULT_FONT_SCALE);
+  } else {
+    const uint8_t legacyScale = prefs.getUChar("scale", 0);
+    cfg.fontScale = legacyScale > 1 ? legacyScale : DEFAULT_FONT_SCALE;
+  }
   prefs.end();
 
   cfg.wifiSsid.trim();
@@ -158,7 +186,7 @@ void saveSettings() {
   prefs.putUShort("port", cfg.serverPort);
   prefs.putUShort("counter", cfg.counterId);
   prefs.putUChar("bright", cfg.brightness);
-  prefs.putUChar("scale", cfg.fontScale);
+  prefs.putUChar("scale2", cfg.fontScale);
   prefs.end();
 }
 
@@ -171,9 +199,11 @@ void clearSettings() {
 // ---------------------------------------------------------------------------
 // Display
 // ---------------------------------------------------------------------------
-uint8_t effectiveScale() {
-  uint8_t maxScale = (uint8_t)max(1, dmd.height() / 5);
-  return (uint8_t)constrain((int)cfg.fontScale, 1, (int)maxScale);
+// Largest whole-number factor that keeps `base` pixels inside `available`.
+static uint8_t fitScale(int base, int available) {
+  if (base <= 0 || available <= 0) return 1;
+  const int scale = available / base;
+  return (uint8_t)(scale < 1 ? 1 : scale);
 }
 
 bool flashActive() {
@@ -201,20 +231,68 @@ String lineToShow() {
   return currentTicket.length() ? currentTicket : String(F("---"));
 }
 
-void renderFrame(const String &line, uint8_t scale) {
+// Renders `text` at 1x into a small scratch bitmap, then copies every lit pixel
+// onto the panel as an sx*sy block. The library fonts are fixed-size bitmaps,
+// so this is how the panel gets larger text.
+static void drawScaledText(const String &text, FansElectronics_Bitmap::Font font,
+                           uint8_t sx, uint8_t sy) {
+  dmd.setFont(font);
+  const int w = dmd.textWidth(text);
+  const int h = dmd.textHeight();
+  if (w <= 0 || h <= 0) return;
+
+  FansElectronics_Bitmap scratch(w, h);
+  if (!scratch.isValid()) {
+    // No heap for the scratch bitmap: draw unscaled rather than nothing.
+    dmd.drawText(0, 0, text);
+    return;
+  }
+
+  scratch.setFont(font);
+  scratch.setTextColor(FansElectronics_Bitmap::White);
+  scratch.drawText(0, 0, text);
+
+  int originX = (dmd.width() - w * sx) / 2;
+  int originY = (dmd.height() - h * sy) / 2;
+  if (originX < 0) originX = 0;
+  if (originY < 0) originY = 0;
+
+  for (int y = 0; y < h; ++y) {
+    for (int x = 0; x < w; ++x) {
+      if (scratch.pixel(x, y) == FansElectronics_Bitmap::White) {
+        dmd.fill(originX + x * sx, originY + y * sy, sx, sy,
+                 FansElectronics_Bitmap::White);
+      }
+    }
+  }
+}
+
+void renderFrame(const String &line) {
   dmd.clear();
-  dmd.setFont(Font5x7b);
   dmd.setTextColor(FansElectronics_Bitmap::White);
 
-  int textW = dmd.textWidth(line);
-  int textH = dmd.textHeight();
-  int startX = (dmd.width() - textW) / 2;
-  int startY = (dmd.height() - textH) / 2;
+  // Prefer the normal 5x7 font. If the ticket is wider than the panel (for
+  // example a 2-letter prefix plus 4 digits), fall back to the narrow 3x5 font
+  // so the whole number stays visible instead of being clipped.
+  FansElectronics_Bitmap::Font font = Font5x7b;
+  dmd.setFont(font);
+  int baseW = dmd.textWidth(line);
+  if (baseW > dmd.width()) {
+    font = Font3x5;
+    dmd.setFont(font);
+    baseW = dmd.textWidth(line);
+  }
+  const int baseH = dmd.textHeight();
+  if (baseW <= 0 || baseH <= 0) return;
 
-  if (startX < 0) startX = 0;
-  if (startY < 0) startY = 0;
+  // Scale width and height independently: fill the panel vertically, and only
+  // widen when the text still fits. cfg.fontScale (1..2) is an upper limit.
+  const uint8_t sx = (uint8_t)min((int)fitScale(baseW, dmd.width()),
+                                  (int)cfg.fontScale);
+  const uint8_t sy = (uint8_t)min((int)fitScale(baseH, dmd.height()),
+                                  (int)cfg.fontScale);
 
-  dmd.drawText(startX, startY, line);
+  drawScaledText(line, font, sx, sy);
 }
 
 void updateDisplay() {
@@ -222,10 +300,11 @@ void updateDisplay() {
 
   if (line != lastLine) {
     lastLine = line;
-    renderFrame(line, effectiveScale());
+    renderFrame(line);
   }
 
-  dmd.update();
+  // Panel refresh is serviced by displayRefreshTask(); updateDisplay() only
+  // redraws the framebuffer when the text changes.
 }
 
 void applyBrightness() {
@@ -367,7 +446,7 @@ bool connectWiFi() {
     if ((uint32_t)(millis() - startedAt) > WIFI_CONNECT_TIMEOUT_MS) {
       return false;
     }
-    dmd.update();
+    // The display refresh task keeps the panel scanning while we wait.
     delay(20);
   }
 
@@ -402,7 +481,7 @@ String buildPortalPage() {
   page.replace(F("%%COUNTER%%"), String(cfg.counterId));
   page.replace(F("%%BRIGHTNESS%%"), String(cfg.brightness));
   page.replace(F("%%FONTSCALE%%"), String(cfg.fontScale));
-  page.replace(F("%%MAXSCALE%%"), String((int)max(1, dmd.height() / 5)));
+  page.replace(F("%%MAXSCALE%%"), String((int)max(1, dmd.height() / 7)));
   page.replace(F("%%APSSID%%"), htmlEscape(apSsid));
   page.replace(F("%%AP_PASSWORD%%"), F(CONFIG_AP_PASSWORD));
   return page;
@@ -620,9 +699,15 @@ void setup() {
   dmd.begin(PANEL_HUB12, PANEL_MODULES_WIDE, PANEL_MODULES_HIGH, panelPins());
   applyBrightness();
 
+  // Refresh the panel from its own task so blocking network I/O in loop()
+  // cannot starve the scan. Keep dmd.update() out of loop() so only this task
+  // touches the SPI bus.
+  xTaskCreatePinnedToCore(displayRefreshTask, "dmd_refresh", 4096, NULL, 1,
+                          &displayTaskHandle, ARDUINO_RUNNING_CORE);
+
   pinMode(CONFIG_BUTTON_PIN, INPUT_PULLUP);
 
-  renderFrame(F("---"), effectiveScale());
+  renderFrame(F("---"));
 
   if (cfg.wifiSsid.length() == 0) {
     Serial.println(F("[EQMS] no Wi-Fi saved, starting setup AP"));

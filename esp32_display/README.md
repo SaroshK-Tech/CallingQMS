@@ -178,13 +178,14 @@ like:
 
 ## 5. Font size and brightness
 
-* The firmware renders text with the library's **3 × 5 pixel font** and scales
-  it by the selected factor (1×–4×).
-* The effective maximum is `panel height / 5`:
-  * 16 px panel (single P10) → up to **3×**
-  * 32 px panel (two rows) → up to **4×**
-* At the default **2×** on a single 32 × 16 panel, a normal 4-character ticket
-  (`A007`) fits without scrolling. Longer numbers (e.g. `VIP001`) scroll left.
+* The firmware renders text with the library's **5 × 7 pixel font** and scales
+  it vertically by the selected factor (1×–2× on a 32 × 16 panel).
+* The effective maximum is `panel height / 7`, so a single 32 × 16 P10 gives
+  **2×** (14 px tall text).
+* At the default **2×**, a 4- or 5-character ticket (`A007`, `A1000`) fills the
+  panel height without scrolling. If a ticket is wider than the panel (e.g. a
+  2-letter prefix plus 4 digits), the firmware switches to the narrow 3 × 5
+  font so the whole number stays visible.
 * Brightness is a real percentage (0 % = off, 100 % = maximum) mapped to the
   panel's 8-bit PWM dimming.
 * Both settings are stored in NVS and survive power loss.
@@ -263,7 +264,7 @@ through ASGI (Daphne/Channels), for example `start_server_on_host.bat` or:
 | Serial shows `WebSocket disconnected` repeatedly | WebSocket blocked by a firewall/proxy, or the server was started with a plain WSGI runner |
 | Cannot enter setup mode | Hold the button ~1.5 s while the board is running; check `CONFIG_BUTTON_PIN` and the GND connection |
 | Setup AP not visible | Wi-Fi credentials were already saved — hold the button, or press **Factory reset** from the web page |
-| Text is cut off | Increase font scale or let it scroll; at 3× a long ticket will always scroll on a 32 px wide panel |
+| Text is cut off | Set font size to 2×; tickets wider than the panel automatically use the narrow 3×5 font |
 | Upload fails | Hold `BOOT`, tap `EN`, release `BOOT`; lower the upload speed to 115200 |
 
 ### Factory reset without the web page

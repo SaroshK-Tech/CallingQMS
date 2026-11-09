@@ -122,9 +122,10 @@ browser's single counter display.
   (`SingleCounterConsumer`); initial/reconnect state from
   `GET /display/api/counter/<counter-id>/` (`display.views.api_counter_now_serving`).
   Snapshot polling: 30 s with WS up, 3 s without.
-- **Display**: ticket number, flash on call/recall, `---` when idle, left scroll
-  when the text is wider than the panel. Font = library `Font3x5` scaled 1×–4×
-  (effective max `panel height / 5`, so 3× on a 16 px panel).
+- **Display**: ticket number, flash on call/recall, `---` when idle. Font =
+  library `Font5x7b`, stretched vertically 1×–2× (effective max
+  `panel height / 7`, so 2× on a 16 px panel); falls back to the narrow
+  `Font3x5` when a ticket is too wide for the panel.
 - **Config button** (default GPIO 0, hold ~1.5 s): starts AP
   `EQMS-Display-XXXX` / `eqms1234`, captive-portal DNS, page at
   `http://192.168.4.1/` for Wi-Fi + password, server host/port, counter id,

@@ -178,12 +178,12 @@ The server must run through ASGI (Daphne/Channels), for example
 
 ## Font size and brightness
 
-- Text uses the library's **3x5 pixel font**, scaled 1x–4x.
-- Effective maximum = `panel height / 5`:
-  - 16 px panel (single P10) -> up to **3x**
-  - 32 px panel (two rows) -> up to **4x**
-- Default **2x** on a single 32x16 panel: a 4-character ticket (`A007`) fits
-  without scrolling; longer text scrolls left.
+- Text uses the library's **5x7 pixel font**, scaled vertically 1x–2x.
+- Effective maximum = `panel height / 7`, so a single 32x16 P10 gives **2x**
+  (14 px tall text).
+- Default **2x** on a single 32x16 panel: a 4- or 5-character ticket (`A007`,
+  `A1000`) fills the panel height. Wider tickets (2-letter prefix + 4 digits)
+  switch to the narrow 3x5 font so nothing is cut off.
 - Brightness 0–100 % maps to the panel's 8-bit PWM dimming.
 - Both values are stored in NVS and survive power loss.
 
@@ -319,5 +319,5 @@ With the panel unpowered:
 | `WebSocket disconnected` repeatedly | Firewall/proxy blocking WS, or a plain WSGI runner |
 | Cannot enter setup mode | Hold the button ~1.5 s while running; check `CONFIG_BUTTON_PIN` and GND |
 | Setup AP not visible | Wi-Fi credentials already saved - hold the button, or use **Factory reset** |
-| Text is cut off | Increase font scale or let it scroll; at 3x a long ticket always scrolls on a 32 px wide panel |
+| Text is cut off | Set font size to 2x; tickets wider than the panel automatically use the narrow 3x5 font |
 | Upload fails | Hold `BOOT`, tap `EN`, release `BOOT`; lower the upload speed to 115200 |
